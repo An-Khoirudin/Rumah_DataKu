@@ -1,0 +1,2469 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Lokus Rumah DataKu</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js & Plugins -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <!-- PapaParse for CSV parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Google GeoChart SDK -->
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        premium: {
+                            dark: '#0f172a',
+                            brand: '#0284c7',
+                            accent: '#0ea5e9',
+                            bg: '#f8fafc',
+                            card: '#ffffff',
+                            warning: '#ea580c'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased pb-12">
+
+    <!-- Top Premium Navbar with Stylish Gradient -->
+    <header class="sticky top-0 z-40 w-full bg-gradient-to-r from-sky-900 via-blue-900 to-indigo-950 text-white shadow-xl backdrop-blur-md border-b border-sky-700/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <button type="button" onclick="exitAdminWorkspace(); this.blur();" class="flex items-center gap-3 text-left hover:opacity-90 transition-opacity focus:outline-none rounded-xl">
+                <div class="p-1.5 bg-white/10 backdrop-blur rounded-xl flex items-center justify-center border border-white/20 shadow-inner">
+                    <img src="Logo.png" alt="Logo Rumah DataKu" class="w-8 h-8 object-contain" onerror="this.src='https://placehold.co/32x32/0284c7/ffffff?text=RDK'">
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-white tracking-tight text-base sm:text-lg flex items-center gap-2">
+                        RUMAH DATAKU
+                    </h1>
+                    <p class="text-xs text-sky-200/80 font-medium">Dashboard Analisis Capaian & Sebaran Lokus</p>
+                </div>
+            </button>
+            
+            <div class="flex items-center gap-3">
+                <span id="data-status" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-200 border border-amber-400/30 backdrop-blur animate-pulse">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                    Menghubungkan Data...
+                </span>
+                
+                <!-- Gated Admin Gateway Trigger -->
+                <button id="admin-gate-btn" onclick="openAdminGateModal()" class="w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 text-sky-100 hover:text-white rounded-xl transition-all shadow-sm border border-white/20 backdrop-blur" title="Portal Admin">
+                    <i class="fa-solid fa-lock text-sky-200 text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= PAGE 1: PUBLIC VIEW ================= -->
+    <main id="view-dashboard" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6 block">
+
+        <!-- Control Bar: Filter System -->
+        <section class="glass-card rounded-2xl p-4 sm:p-6 shadow-sm">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-sky-600"></i>
+                        Filter Kontrol Data
+                    </h2>
+                    <p class="text-xs text-slate-500">Saring visualisasi data lokus berdasarkan status validasi, tahun, dan wilayah</p>
+                </div>
+                <!-- Filters Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full lg:w-auto min-w-[280px] lg:min-w-[800px]">
+                    <!-- Filter Status Validasi (Modified: Removed 'Belum Tervalidasi' & 'Perlu Validasi Ulang') -->
+                    <div class="relative">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Status Validasi</label>
+                        <select id="filter-status-validasi" onchange="onFilterChange()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all font-medium">
+                            <option value="all">Semua Status Validasi</option>
+                            <option value="Sesuai">Sesuai</option>
+                            <option value="Butuh Perbaikan">Butuh Perbaikan</option>
+                        </select>
+                    </div>
+                    <!-- Filter Tahun -->
+                    <div class="relative">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Tahun Kegiatan</label>
+                        <select id="filter-tahun" onchange="onFilterChange()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all font-medium">
+                            <option value="all">Semua Tahun (Akumulasi)</option>
+                            <option value="2025">Tahun 2025</option>
+                            <option value="2026">Tahun 2026</option>
+                        </select>
+                    </div>
+                    <!-- Filter Provinsi -->
+                    <div class="relative">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Provinsi</label>
+                        <select id="filter-provinsi" onchange="onProvinsiFilterChange()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all font-medium">
+                            <option value="all">Semua Provinsi</option>
+                        </select>
+                    </div>
+                    <!-- Filter Kab/Kota -->
+                    <div class="relative">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Kabupaten / Kota</label>
+                        <select id="filter-kabkota" onchange="onFilterChange()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all font-medium" disabled>
+                            <option value="all">Semua Kab / Kota</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KPI SUMMARY SECTION -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Card 1: Total Lokus -->
+            <div class="glass-card rounded-2xl p-6 shadow-sm flex items-center gap-5 relative overflow-hidden group">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/20 group-hover:scale-105 transition-transform duration-300">
+                    <i class="fa-solid fa-house-chimney-window text-2xl"></i>
+                </div>
+                <div class="space-y-1 z-10 flex-1">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Lokus Terbentuk</p>
+                    <div class="flex items-baseline gap-2">
+                        <span id="kpi-total-lokus" class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">0</span>
+                        <span class="text-xs font-semibold text-slate-500">Lokus</span>
+                    </div>
+                    <p class="text-xs text-slate-500 flex items-center gap-1.5">
+                        <i class="fa-solid fa-fingerprint text-sky-500"></i>
+                        Berdasarkan Banyaknya Lokus Terdata
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card 2: Capaian Target Dinamis -->
+            <div class="glass-card rounded-2xl p-6 shadow-sm space-y-4 relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p id="kpi-target-title" class="text-xs font-bold text-slate-400 uppercase tracking-wider">Capaian Akumulasi</p>
+                        <div class="flex items-baseline gap-1.5 mt-1">
+                            <span id="kpi-capaian-aktual" class="text-3xl font-extrabold text-slate-900">0</span>
+                            <span class="text-xs text-slate-400 font-bold">/</span>
+                            <span id="kpi-capaian-target" class="text-sm font-bold text-slate-500">0</span>
+                        </div>
+                    </div>
+                    <span id="kpi-target-badge" class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-sky-50 text-sky-700 border border-sky-200">
+                        4 per Kab/Kota
+                    </span>
+                </div>
+                <div class="space-y-1.5">
+                    <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                        <div id="kpi-progress-bar" class="h-full bg-sky-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 font-medium">Persentase Capaian:</span>
+                        <span id="kpi-capaian-persen" class="font-extrabold text-sky-600">0%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DATA VISUALIZATION GRID (ROW 1) -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Google GeoChart Map -->
+            <div class="glass-card rounded-2xl p-6 shadow-sm lg:col-span-8 flex flex-col min-h-[480px]">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="space-y-1">
+                        <h3 class="text-base font-bold text-slate-900">Peta Sebaran & Capaian Lokus per Provinsi</h3>
+                        <p class="text-xs text-slate-500">Intensitas warna menunjukkan tingkat pemenuhan target akumulatif per wilayah</p>
+                    </div>
+                    <div class="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
+                        <i class="fa-solid fa-map-location text-sm"></i>
+                    </div>
+                </div>
+                <div class="flex-1 w-full flex items-center justify-center rounded-xl bg-slate-50 border border-slate-100 overflow-hidden min-h-[350px]" id="geochart-container">
+                    <div id="geochart-canvas" class="w-full h-full min-h-[350px]"></div>
+                </div>
+            </div>
+
+            <!-- Line Chart: Tren Akumulatif -->
+            <div class="glass-card rounded-2xl p-6 shadow-sm lg:col-span-4 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="space-y-1">
+                        <h3 class="text-base font-bold text-slate-900">Tren Akumulasi Lokus Per Tahun</h3>
+                        <p class="text-xs text-slate-500">Grafik historis pertumbuhan jumlah Rumah DataKu secara akumulatif</p>
+                    </div>
+                    <div class="p-2.5 bg-sky-50 text-sky-600 rounded-xl">
+                        <i class="fa-solid fa-chart-line text-sm"></i>
+                    </div>
+                </div>
+                <div class="flex-1 w-full flex items-center justify-center min-h-[280px]">
+                    <canvas id="chart-tren-tahun" class="w-full max-h-[280px]"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- DATA VISUALIZATION GRID (ROW 2) -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="glass-card rounded-2xl p-6 shadow-sm lg:col-span-4 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="space-y-1">
+                        <h3 class="text-base font-bold text-slate-900">Frekuensi Pemutakhiran Data</h3>
+                        <p class="text-xs text-slate-500">Keaktifan updating data lokus secara berkala per tahun</p>
+                    </div>
+                    <div class="p-2.5 bg-sky-50 text-sky-600 rounded-xl">
+                        <i class="fa-solid fa-arrows-rotate text-sm"></i>
+                    </div>
+                </div>
+                <div class="flex-1 w-full flex items-center justify-center min-h-[280px]">
+                    <canvas id="chart-frekuensi-update" class="w-full max-h-[280px]"></canvas>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6 shadow-sm lg:col-span-4 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="space-y-1">
+                        <h3 class="text-base font-bold text-slate-900">Pemanfaatan Berdasarkan Jenis Kegiatan</h3>
+                        <p class="text-xs text-slate-500">Jumlah Lokus Rumah DataKu berdasarkan kategori pemanfaatan data</p>
+                    </div>
+                    <div class="p-2.5 bg-sky-50 text-sky-600 rounded-xl">
+                        <i class="fa-solid fa-briefcase text-sm"></i>
+                    </div>
+                </div>
+                <div class="flex-1 w-full flex items-center justify-center min-h-[280px]">
+                    <canvas id="chart-jenis-pemanfaatan" class="w-full max-h-[280px]"></canvas>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6 shadow-sm lg:col-span-4 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="space-y-1">
+                        <h3 class="text-base font-bold text-slate-900">Intensitas Pemanfaatan Data</h3>
+                        <p class="text-xs text-slate-500">Pengelompokan Lokus berdasarkan jumlah variasi kategori pemanfaatan data</p>
+                    </div>
+                    <div class="p-2.5 bg-blue-50 text-blue-900 rounded-xl">
+                        <i class="fa-solid fa-chart-pie text-sm"></i>
+                    </div>
+                </div>
+                <div class="flex-1 w-full flex items-center justify-center min-h-[280px]">
+                    <canvas id="chart-intensitas-pemanfaatan" class="w-full max-h-[280px]"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- TABLE SECTION: SEBARAN KABUPATEN / KOTA -->
+        <section class="grid grid-cols-1 gap-6">
+            <div class="glass-card rounded-2xl p-6 shadow-sm flex flex-col">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                    <div class="space-y-1">
+                        <h3 class="text-base font-bold text-slate-900">Sebaran Lokus per Kab / Kota</h3>
+                        <p class="text-xs text-slate-500">Daftar sebaran jumlah Rumah DataKu di masing-masing wilayah kabupaten atau kota</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="relative w-full sm:w-64">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            </span>
+                            <input type="text" id="search-kabkota" oninput="renderKabkotaList()" placeholder="Cari nama Kab/Kota..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
+                        </div>
+                    </div>
+                </div>
+                <div class="max-h-[300px] overflow-y-auto border border-slate-100 rounded-xl bg-slate-50/50 p-2 space-y-2" id="kabkota-sebaran-list"></div>
+            </div>
+        </section>
+
+        <!-- REKAP TABLE SECTION (Updated columns: No > Provinsi > Total Lokus > Target > Sesuai > Butuh Perbaikan > Bukti Dukung Belum lengkap) -->
+        <section class="grid grid-cols-1 gap-6">
+            <div class="glass-card rounded-2xl p-6 shadow-sm flex flex-col border-t-4 border-t-sky-600">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="p-1.5 bg-sky-100 text-sky-700 rounded-lg">
+                                <i class="fa-solid fa-table-list text-sm"></i>
+                            </span>
+                            <h3 class="text-base font-bold text-slate-900">Rekap Status Lokus Rumah DataKu</h3>
+                        </div>
+                        <p class="text-xs text-slate-500">Jumlah akumulasi Lokus berdasarkan Target & Status Validasi per provinsi (Daftar Lengkap 38 Provinsi)</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="relative w-full sm:w-60">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            </span>
+                            <input type="text" id="search-tabel-rekap" oninput="onSearchTabelRekap()" placeholder="Cari Nama Provinsi..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
+                        </div>
+                        <button onclick="exportRekapToExcel()" class="flex items-center gap-1.5 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-sky-500/10">
+                            <i class="fa-solid fa-file-excel text-sm"></i>
+                            Ekspor Rekap Excel
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-200 rounded-xl bg-white shadow-sm">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200 uppercase tracking-wider">
+                                <th class="py-3.5 px-4 text-center w-12">No</th>
+                                <th class="py-3.5 px-4">Provinsi</th>
+                                <th class="py-3.5 px-4 text-center font-extrabold text-slate-900 bg-slate-100/50">Total Lokus</th>
+                                <th class="py-3.5 px-4 text-center text-sky-700 bg-sky-50/50">Target</th>
+                                <th class="py-3.5 px-4 text-center text-emerald-700">Sesuai</th>
+                                <th class="py-3.5 px-4 text-center text-rose-700">Butuh Perbaikan</th>
+                                <th class="py-3.5 px-4 text-center text-orange-700">Bukti Dukung Belum lengkap</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-rekap-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                        <tfoot id="tabel-rekap-foot" class="bg-slate-100/80 font-bold text-slate-900 border-t-2 border-slate-300"></tfoot>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TABLE SECTION: DETAIL DATA RUMAH DATAKU WITH STATUS VALIDASI -->
+        <section class="grid grid-cols-1 gap-6">
+            <div class="glass-card rounded-2xl p-6 shadow-sm flex flex-col">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div class="space-y-1">
+                        <h3 class="text-base font-bold text-slate-900">Daftar Lokus Rumah DataKu</h3>
+                        <p class="text-xs text-slate-500">Detail komprehensif data spasial, kegiatan, dan status validasi lokasi</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="relative w-full sm:w-60">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            </span>
+                            <input type="text" id="search-tabel-utama" oninput="onSearchTabelUtama()" placeholder="Cari Kecamatan / Desa..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
+                        </div>
+                        <button onclick="exportToExcel()" class="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-emerald-500/10">
+                            <i class="fa-solid fa-file-excel text-sm"></i>
+                            Ekspor ke Excel
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-200 rounded-xl bg-white shadow-sm">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200 uppercase tracking-wider">
+                                <th class="py-3.5 px-4 text-center w-12">No</th>
+                                <th class="py-3.5 px-4">Status Validasi</th>
+                                <th class="py-3.5 px-4">Tahun</th>
+                                <th class="py-3.5 px-4">Provinsi</th>
+                                <th class="py-3.5 px-4">Kab / Kota</th>
+                                <th class="py-3.5 px-4">Kecamatan</th>
+                                <th class="py-3.5 px-4">Desa / Kelurahan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-lokus-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                    </table>
+                </div>
+
+                <div class="flex items-center justify-between mt-4 text-xs font-semibold text-slate-500">
+                    <span id="tabel-pagination-info">Menampilkan 0-0 dari 0 baris</span>
+                    <div class="flex items-center gap-1">
+                        <button id="btn-prev-page" onclick="changePage(-1)" class="p-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg transition-all disabled:opacity-50">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button id="btn-next-page" onclick="changePage(1)" class="p-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg transition-all disabled:opacity-50">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ================= PAGE 2: ADMIN GATED VIEW ================= -->
+    <main id="view-admin" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6 hidden">
+        
+        <!-- Admin Section Header -->
+        <section class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 bg-slate-900 text-white rounded-2xl shadow-xl gap-4">
+            <div class="flex items-center gap-4">
+                <div class="p-3 bg-amber-500 text-slate-950 rounded-xl text-lg flex items-center justify-center shadow-lg shadow-amber-500/20">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold tracking-tight">Halaman Pusat Kualitas Data (Admin Panel)</h2>
+                    <p class="text-xs text-slate-400">Verifikasi, pelacakan anomali, dan pembersihan integritas database Rumah DataKu</p>
+                </div>
+            </div>
+            
+            <button onclick="exitAdminWorkspace()" class="flex items-center gap-1.5 px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-bold rounded-xl transition-all shadow-md">
+                <i class="fa-solid fa-arrow-left"></i>
+                Kembali ke Dashboard Publik
+            </button>
+        </section>
+
+        <!-- Audit Panel Grid 1: Duplicate Audit Table -->
+        <section class="grid grid-cols-1 gap-6">
+            <div class="glass-card rounded-2xl p-6 shadow-sm border-l-4 border-l-amber-500 flex flex-col">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="flex h-2.5 w-2.5 relative">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                            </span>
+                            <h3 class="text-base font-bold text-slate-900">1. Deteksi Data Duplikat (Konflik ID Spasial)</h3>
+                        </div>
+                        <p class="text-xs text-slate-500">Menampilkan wilayah administratif desa yang didaftarkan lebih dari satu kali menggunakan ID yang berbeda</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="relative w-full sm:w-60">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            </span>
+                            <input type="text" id="search-tabel-duplikat" oninput="onSearchTabelDuplikat()" placeholder="Cari data duplikat..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
+                        </div>
+                        <button onclick="exportDuplicatesToExcel()" class="flex items-center gap-1.5 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-amber-500/10">
+                            <i class="fa-solid fa-triangle-exclamation text-sm"></i>
+                            Ekspor Audit Duplikat
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-amber-100 rounded-xl bg-white shadow-sm">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-amber-50/50 text-amber-800 font-bold border-b border-amber-100 uppercase tracking-wider">
+                                <th class="py-3.5 px-4 text-center w-12">No</th>
+                                <th class="py-3.5 px-4">Provinsi</th>
+                                <th class="py-3.5 px-4">Kab / Kota</th>
+                                <th class="py-3.5 px-4">Kecamatan</th>
+                                <th class="py-3.5 px-4">Desa / Kelurahan</th>
+                                <th class="py-3.5 px-4 text-center">ID Terlibat</th>
+                                <th class="py-3.5 px-4 text-center">Entri Baris</th>
+                                <th class="py-3.5 px-4">Analisis Masalah</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-duplikat-body" class="divide-y divide-amber-50 text-slate-700"></tbody>
+                    </table>
+                </div>
+
+                <div class="flex items-center justify-between mt-4 text-xs font-semibold text-slate-500">
+                    <span id="tabel-duplikat-pagination-info">Menampilkan 0-0 dari 0 baris duplikat</span>
+                    <div class="flex items-center gap-1">
+                        <button id="btn-prev-dup-page" onclick="changeDupPage(-1)" class="p-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg transition-all disabled:opacity-50">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button id="btn-next-dup-page" onclick="changeDupPage(1)" class="p-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg transition-all disabled:opacity-50">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Audit Panel Grid 2: Pemanfaatan Anomalies -->
+        <section class="grid grid-cols-1 gap-6">
+            <div class="glass-card rounded-2xl p-6 shadow-sm border-l-4 border-l-rose-500 flex flex-col">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="flex h-2.5 w-2.5 relative">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
+                            </span>
+                            <h3 class="text-base font-bold text-slate-900">2. Deteksi Anomali Kolom Pemanfaatan</h3>
+                        </div>
+                        <p class="text-xs text-slate-500">Menampilkan baris data yang isian kolom status pemanfaatannya tidak terdaftar (selain "Ya" atau "Tidak")</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="relative w-full sm:w-60">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            </span>
+                            <input type="text" id="search-tabel-pemanf" oninput="onSearchTabelPemanf()" placeholder="Cari anomali pemanfaatan..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium">
+                        </div>
+                        <button onclick="exportPemanfAnomaliesToExcel()" class="flex items-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-rose-500/10">
+                            <i class="fa-solid fa-ban text-sm"></i>
+                            Ekspor Anomali Pemanfaatan
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-rose-100 rounded-xl bg-white shadow-sm">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-rose-50/50 text-rose-800 font-bold border-b border-rose-100 uppercase tracking-wider">
+                                <th class="py-3.5 px-4 text-center w-12">No</th>
+                                <th class="py-3.5 px-4">Lokus ID</th>
+                                <th class="py-3.5 px-4">Tahun</th>
+                                <th class="py-3.5 px-4">Provinsi</th>
+                                <th class="py-3.5 px-4">Kab / Kota</th>
+                                <th class="py-3.5 px-4">Desa</th>
+                                <th class="py-3.5 px-4 text-center">Isian Nilai</th>
+                                <th class="py-3.5 px-4">Rekomendasi Koreksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-pemanf-body" class="divide-y divide-rose-50 text-slate-700"></tbody>
+                    </table>
+                </div>
+
+                <div class="flex items-center justify-between mt-4 text-xs font-semibold text-slate-500">
+                    <span id="tabel-pemanf-pagination-info">Menampilkan 0-0 dari 0 baris anomali</span>
+                    <div class="flex items-center gap-1">
+                        <button id="btn-prev-pemanf-page" onclick="changePemanfPage(-1)" class="p-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg transition-all disabled:opacity-50">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button id="btn-next-pemanf-page" onclick="changePemanfPage(1)" class="p-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg transition-all disabled:opacity-50">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Audit Panel Grid 3: Pemutakhiran Anomalies -->
+        <section class="grid grid-cols-1 gap-6">
+            <div class="glass-card rounded-2xl p-6 shadow-sm border-l-4 border-l-violet-500 flex flex-col">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="flex h-2.5 w-2.5 relative">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-violet-500"></span>
+                            </span>
+                            <h3 class="text-base font-bold text-slate-900">3. Deteksi Anomali Kolom Pemutakhiran Data</h3>
+                        </div>
+                        <p class="text-xs text-slate-500">Menampilkan baris data yang isian kolom pemutakhirannya tidak standar (selain "1 Kali", "2 Kali", atau "> 2 Kali")</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="relative w-full sm:w-60">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            </span>
+                            <input type="text" id="search-tabel-update" oninput="onSearchTabelUpdate()" placeholder="Cari anomali pemutakhiran..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-violet-500 font-medium">
+                        </div>
+                        <button onclick="exportUpdateAnomaliesToExcel()" class="flex items-center gap-1.5 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-violet-500/10">
+                            <i class="fa-solid fa-triangle-exclamation text-sm"></i>
+                            Ekspor Anomali Pemutakhiran
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-violet-100 rounded-xl bg-white shadow-sm">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-violet-50/50 text-violet-800 font-bold border-b border-violet-100 uppercase tracking-wider">
+                                <th class="py-3.5 px-4 text-center w-12">No</th>
+                                <th class="py-3.5 px-4">Lokus ID</th>
+                                <th class="py-3.5 px-4">Tahun</th>
+                                <th class="py-3.5 px-4">Provinsi</th>
+                                <th class="py-3.5 px-4">Kab / Kota</th>
+                                <th class="py-3.5 px-4">Desa</th>
+                                <th class="py-3.5 px-4 text-center">Isian Nilai</th>
+                                <th class="py-3.5 px-4">Rekomendasi Koreksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-update-body" class="divide-y divide-violet-50 text-slate-700"></tbody>
+                    </table>
+                </div>
+
+                <div class="flex items-center justify-between mt-4 text-xs font-semibold text-slate-500">
+                    <span id="tabel-update-pagination-info">Menampilkan 0-0 dari 0 baris anomali</span>
+                    <div class="flex items-center gap-1">
+                        <button id="btn-prev-update-page" onclick="changeUpdatePage(-1)" class="p-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg transition-all disabled:opacity-50">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button id="btn-next-update-page" onclick="changeUpdatePage(1)" class="p-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg transition-all disabled:opacity-50">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Audit Panel Grid 4: Incomplete Data -->
+        <section class="grid grid-cols-1 gap-6">
+            <div class="glass-card rounded-2xl p-6 shadow-sm border-l-4 border-l-sky-500 flex flex-col">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="flex h-2.5 w-2.5 relative">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-500"></span>
+                            </span>
+                            <h3 class="text-base font-bold text-slate-900">4. Deteksi Data Belum Lengkap (Sel Kosong / NULL)</h3>
+                        </div>
+                        <p class="text-xs text-slate-500">Menampilkan baris data yang memiliki kolom kosong pada indikator Pemutakhiran Data atau Pemanfaatan Aktif</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="relative w-full sm:w-60">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            </span>
+                            <input type="text" id="search-tabel-incomplete" oninput="onSearchTabelIncomplete()" placeholder="Cari data belum lengkap..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
+                        </div>
+                        <button onclick="exportIncompleteToExcel()" class="flex items-center gap-1.5 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-sky-500/10">
+                            <i class="fa-solid fa-square-minus text-sm"></i>
+                            Ekspor Data Belum Lengkap
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-sky-100 rounded-xl bg-white shadow-sm">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-sky-50/50 text-sky-800 font-bold border-b border-sky-100 uppercase tracking-wider">
+                                <th class="py-3.5 px-4 text-center w-12">No</th>
+                                <th class="py-3.5 px-4">Lokus ID</th>
+                                <th class="py-3.5 px-4">Tahun</th>
+                                <th class="py-3.5 px-4">Provinsi</th>
+                                <th class="py-3.5 px-4">Kab / Kota</th>
+                                <th class="py-3.5 px-4">Desa</th>
+                                <th class="py-3.5 px-4 text-center">Bagian Yang Kosong</th>
+                                <th class="py-3.5 px-4">Rekomendasi Koreksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-incomplete-body" class="divide-y divide-sky-50 text-slate-700"></tbody>
+                    </table>
+                </div>
+
+                <div class="flex items-center justify-between mt-4 text-xs font-semibold text-slate-500">
+                    <span id="tabel-incomplete-pagination-info">Menampilkan 0-0 dari 0 baris belum lengkap</span>
+                    <div class="flex items-center gap-1">
+                        <button id="btn-prev-incomplete-page" onclick="changeIncompletePage(-1)" class="p-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg transition-all disabled:opacity-50">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button id="btn-next-incomplete-page" onclick="changeIncompletePage(1)" class="p-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg transition-all disabled:opacity-50">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Audit Panel Grid 5: Validation Queue -->
+        <section class="grid grid-cols-1 gap-6">
+            <div class="glass-card rounded-2xl p-6 shadow-sm border-l-4 border-l-indigo-600 flex flex-col">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="flex h-2.5 w-2.5 relative">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-600"></span>
+                            </span>
+                            <h3 class="text-base font-bold text-slate-900">5. Daftar Lokus yang Perlu di Validasi</h3>
+                        </div>
+                        <p class="text-xs text-slate-500">Menampilkan khusus Lokus dengan status "Belum Tervalidasi" dan "Perlu Validasi Ulang"</p>
+                    </div>
+                    
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="relative w-full sm:w-44">
+                            <select id="filter-val-provinsi" onchange="onValFilterChange()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                                <option value="all">Semua Provinsi</option>
+                            </select>
+                        </div>
+                        <div class="relative w-full sm:w-64">
+                            <select id="filter-val-status-khusus" onchange="onValFilterChange()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                                <option value="all">Semua ("Belum Tervalidasi" & "Perlu Validasi Ulang")</option>
+                                <option value="Belum Tervalidasi">Belum Tervalidasi</option>
+                                <option value="Perlu Validasi Ulang">Perlu Validasi Ulang</option>
+                            </select>
+                        </div>
+                        <div class="relative w-full sm:w-48">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            </span>
+                            <input type="text" id="search-tabel-validation" oninput="onSearchTabelValidation()" placeholder="Cari lokasi validasi..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                        </div>
+                        <button onclick="exportValidationToExcel()" class="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-indigo-500/10">
+                            <i class="fa-solid fa-clipboard-check text-sm"></i>
+                            Ekspor Daftar Validasi
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-indigo-100 rounded-xl bg-white shadow-sm">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-indigo-50/50 text-indigo-900 font-bold border-b border-indigo-100 uppercase tracking-wider">
+                                <th class="py-3.5 px-4 text-center w-12">No</th>
+                                <th class="py-3.5 px-4">Lokus ID</th>
+                                <th class="py-3.5 px-4">Provinsi</th>
+                                <th class="py-3.5 px-4">Kab / Kota</th>
+                                <th class="py-3.5 px-4">Kecamatan</th>
+                                <th class="py-3.5 px-4">Desa / Kelurahan</th>
+                                <th class="py-3.5 px-4">Status Validasi</th>
+                                <th class="py-3.5 px-4">Rekomendasi Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-validation-body" class="divide-y divide-indigo-50 text-slate-700"></tbody>
+                    </table>
+                </div>
+
+                <div class="flex items-center justify-between mt-4 text-xs font-semibold text-slate-500">
+                    <span id="tabel-validation-pagination-info">Menampilkan 0-0 dari 0 Lokus</span>
+                    <div class="flex items-center gap-1">
+                        <button id="btn-prev-val-page" onclick="changeValidationPage(-1)" class="p-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg transition-all disabled:opacity-50">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button id="btn-next-val-page" onclick="changeValidationPage(1)" class="p-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg transition-all disabled:opacity-50">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW ADMIN TABLE SECTION: REKAP STATUS VALIDASI KHUSUS (PERLU VALIDASI ULANG & BELUM TERVALIDASI) -->
+        <section class="grid grid-cols-1 gap-6">
+            <div class="glass-card rounded-2xl p-6 shadow-sm border-l-4 border-l-purple-600 flex flex-col">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="p-1.5 bg-purple-100 text-purple-700 rounded-lg">
+                                <i class="fa-solid fa-table-list text-sm"></i>
+                            </span>
+                            <h3 class="text-base font-bold text-slate-900">6. Rekap Status Validasi Khusus (Admin)</h3>
+                        </div>
+                        <p class="text-xs text-slate-500">Jumlah akumulasi Lokus khusus status "Perlu Validasi Ulang" dan "Belum Tervalidasi" per provinsi</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="relative w-full sm:w-60">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            </span>
+                            <input type="text" id="search-tabel-admin-rekap" oninput="onSearchTabelAdminRekap()" placeholder="Cari Nama Provinsi..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 font-medium">
+                        </div>
+                        <button onclick="exportAdminRekapToExcel()" class="flex items-center gap-1.5 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-purple-500/10">
+                            <i class="fa-solid fa-file-excel text-sm"></i>
+                            Ekspor Rekap Admin
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-purple-100 rounded-xl bg-white shadow-sm">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-purple-50/50 text-purple-900 font-bold border-b border-purple-100 uppercase tracking-wider">
+                                <th class="py-3.5 px-4 text-center w-12">No</th>
+                                <th class="py-3.5 px-4">Provinsi</th>
+                                <th class="py-3.5 px-4 text-center text-indigo-700 bg-indigo-50/30">Perlu Validasi Ulang</th>
+                                <th class="py-3.5 px-4 text-center text-amber-700 bg-amber-50/30">Belum Tervalidasi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-admin-rekap-body" class="divide-y divide-purple-50 text-slate-700"></tbody>
+                        <tfoot id="tabel-admin-rekap-foot" class="bg-slate-100/80 font-bold text-slate-900 border-t-2 border-slate-300"></tfoot>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ================= ADMIN GATE MODAL ================= -->
+    <div id="admin-gate-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm transition-all duration-300 hidden opacity-0">
+        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden border border-slate-100 scale-95 transition-all duration-300" id="admin-modal-box">
+            <div class="p-6 bg-slate-950 text-white text-center relative">
+                <button onclick="closeAdminGateModal()" class="absolute right-4 top-4 text-slate-400 hover:text-white transition-all">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+                <div class="mx-auto w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center text-lg mb-3 shadow-lg shadow-amber-500/20">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h3 class="text-base font-extrabold tracking-tight">Halaman ini Khusus Admin !!</h3>
+                <p class="text-xs text-slate-400 mt-1">Silakan masukkan PIN Otoritas Admin untuk membuka akses (Gunakan PIN default: <span class="font-bold text-amber-400">1234</span>)</p>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">PIN Otoritas Khusus</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-key text-xs"></i>
+                        </span>
+                        <input type="password" id="admin-pin-field" onkeydown="if(event.key === 'Enter') submitAdminPIN()" placeholder="Ketik PIN di sini..." class="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-sky-500 font-bold tracking-widest text-slate-800">
+                    </div>
+                </div>
+                
+                <div id="admin-error-panel" class="hidden items-center gap-2 p-3 bg-rose-50 border border-rose-100 text-rose-700 text-xs font-semibold rounded-xl">
+                    <i class="fa-solid fa-circle-exclamation text-sm"></i>
+                    <span id="admin-error-msg">PIN salah. Silakan coba kembali!</span>
+                </div>
+
+                <button onclick="submitAdminPIN()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-all shadow-lg flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-unlock text-xs"></i>
+                    Buka Gerbang Admin
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Logic Core -->
+    <script>
+        // State Management
+        let rawDatabase = [];
+        let filteredDatabase = [];
+        
+        // Audit Lists
+        let duplicateList = [];
+        let pemanfAnomalyList = [];
+        let updateAnomalyList = [];
+        let incompleteList = [];
+        let validationList = [];
+        
+        // Pagination States: Dashboard Main Table
+        let currentTablePage = 1;
+        const rowsPerPage = 10;
+        let searchFilterText = '';
+
+        // Search Filter State: Rekap Status Lokus Table
+        let searchRekapText = '';
+
+        // Search Filter State: Admin Rekap Table
+        let searchAdminRekapText = '';
+
+        // Pagination States: Duplicates Audit
+        let currentDupPage = 1;
+        const dupRowsPerPage = 5;
+        let searchDupText = '';
+
+        // Pagination States: Pemanf Anomalies
+        let currentPemanfPage = 1;
+        const pemanfRowsPerPage = 5;
+        let searchPemanfText = '';
+
+        // Pagination States: Update Anomalies
+        let currentUpdatePage = 1;
+        const updateRowsPerPage = 5;
+        let searchUpdateText = '';
+
+        // Pagination States: Incomplete Data
+        let currentIncompletePage = 1;
+        const incompleteRowsPerPage = 5;
+        let searchIncompleteText = '';
+
+        // Pagination States: Validation Queue
+        let currentValidationPage = 1;
+        const validationRowsPerPage = 5;
+        let searchValidationText = '';
+        let filterValProv = 'all';
+        let filterValStatusKhusus = 'all';
+
+        // Chart References
+        let chartTren = null;
+        let chartFrekuensi = null;
+        let chartPemanfaatan = null;
+        let chartIntensitas = null;
+
+        // ISO Mapping for Google GeoChart
+        const provinceIsoMapping = {
+            "ACEH": "ID-AC", "SUMATERA UTARA": "ID-SU", "SUMATERA BARAT": "ID-SB", "RIAU": "ID-RI",
+            "JAMBI": "ID-JA", "SUMATERA SELATAN": "ID-SS", "BENGKULU": "ID-BE", "LAMPUNG": "ID-LA",
+            "KEPULAUAN BANGKA BELITUNG": "ID-BB", "KEPULAUAN RIAU": "ID-KR", "DKI JAKARTA": "ID-JK",
+            "JAWA BARAT": "ID-JB", "JAWA TENGAH": "ID-JT", "DI YOGYAKARTA": "ID-YO", "JAWA TIMUR": "ID-JI",
+            "BANTEN": "ID-BT", "BALI": "ID-BA", "NUSA TENGGARA BARAT": "ID-NB", "NUSA TENGGARA TIMUR": "ID-NT",
+            "KALIMANTAN BARAT": "ID-KB", "KALIMANTAN TENGAH": "ID-KT", "KALIMANTAN SELATAN": "ID-KS",
+            "KALIMANTAN TIMUR": "ID-KI", "KALIMANTAN UTARA": "ID-KU", "SULAWESI UTARA": "ID-SA",
+            "SULAWESI TENGAH": "ID-ST", "SULAWESI SELATAN": "ID-SN", "SULAWESI TENGGARA": "ID-SG",
+            "GORONTALO": "ID-GO", "SULAWESI BARAT": "ID-SR", "MALUKU": "ID-MA", "MALUKU UTARA": "ID-MU",
+            "PAPUA": "ID-PA", "PAPUA BARAT": "ID-PB", "PAPUA SELATAN": "ID-PS", "PAPUA TENGAH": "ID-PT",
+            "PAPUA PEGUNUNGAN": "ID-PE", "PAPUA BARAT DAYA": "ID-PD"
+        };
+
+        // Complete 38 Provinces Regencies Count Map
+        const totalRegenciesByProvince = {
+            "ACEH": 23, "SUMATERA UTARA": 33, "SUMATERA BARAT": 19, "RIAU": 12, "JAMBI": 11,
+            "SUMATERA SELATAN": 17, "BENGKULU": 10, "LAMPUNG": 15, "KEPULAUAN BANGKA BELITUNG": 7,
+            "KEPULAUAN RIAU": 7, "DKI JAKARTA": 6, "JAWA BARAT": 27, "JAWA TENGAH": 35,
+            "DI YOGYAKARTA": 5, "JAWA TIMUR": 38, "BANTEN": 8, "BALI": 9, "NUSA TENGGARA BARAT": 10,
+            "NUSA TENGGARA TIMUR": 22, "KALIMANTAN BARAT": 14, "KALIMANTAN TENGAH": 14,
+            "KALIMANTAN SELATAN": 13, "KALIMANTAN TIMUR": 10, "KALIMANTAN UTARA": 5,
+            "SULAWESI UTARA": 15, "SULAWESI TENGAH": 13, "SULAWESI SELATAN": 24, "SULAWESI TENGGARA": 17,
+            "GORONTALO": 6, "SULAWESI BARAT": 6, "MALUKU": 11, "MALUKU UTARA": 10, "PAPUA": 9,
+            "PAPUA BARAT": 7, "PAPUA SELATAN": 4, "PAPUA TENGAH": 8, "PAPUA PEGUNUNGAN": 8, "PAPUA BARAT DAYA": 6
+        };
+
+        const fallbackDatabase = [
+            { id: "1001", Status: "Belum Tervalidasi", status_kelengkapan: "Belum Lengkap", perbaikan: "-", tahun: "2025", provinsi: "DI YOGYAKARTA", kabkota: "SLEMAN", kecamatan: "DEPOK", desa: "CATURTUNGGAL", pembaruan: "1 Kali", pemanf_aktif: "Ya", pemanf_jenis: "Perencanaan" },
+            { id: "1002", Status: "Perlu Validasi Ulang", status_kelengkapan: "Lengkap", perbaikan: "Sudah", tahun: "2025", provinsi: "DKI JAKARTA", kabkota: "JAKARTA SELATAN", kecamatan: "CILANDAK", desa: "GANDARIA SELATAN", pembaruan: "2 Kali", pemanf_aktif: "Ya", pemanf_jenis: "Penelitian" },
+            { id: "1003", Status: "Belum Tervalidasi", status_kelengkapan: "Lengkap", perbaikan: "-", tahun: "2026", provinsi: "JAWA BARAT", kabkota: "BANDUNG", kecamatan: "COBLONG", desa: "DAGO", pembaruan: "1 Kali", pemanf_aktif: "Ya", pemanf_jenis: "Perencanaan" },
+            { id: "1004", Status: "Butuh Perbaikan", status_kelengkapan: "Belum Lengkap", perbaikan: "Belum", tahun: "2025", provinsi: "JAWA BARAT", kabkota: "BOGOR", kecamatan: "CIBINONG", desa: "PAKANSARI", pembaruan: "Tidak Ada Keterangan", pemanf_aktif: "Tidak", pemanf_jenis: "" },
+            { id: "1005", Status: "Sesuai", status_kelengkapan: "Lengkap", perbaikan: "Sudah", tahun: "2025", provinsi: "DI YOGYAKARTA", kabkota: "KULON PROGO", kecamatan: "WATES", desa: "WATES", pembaruan: "2 Kali", pemanf_aktif: "Ya", pemanf_jenis: "Perencanaan" },
+            { id: "1006", Status: "Perlu Validasi Ulang", status_kelengkapan: "Belum Lengkap", perbaikan: "Sudah", tahun: "2026", provinsi: "DI YOGYAKARTA", kabkota: "KULON PROGO", kecamatan: "TEMON", desa: "GLAGAH", pembaruan: "1 Kali", pemanf_aktif: "Ya", pemanf_jenis: "Intervensi" },
+            { id: "2001", Status: "Perlu Validasi Ulang", status_kelengkapan: "Lengkap", perbaikan: "Sudah", tahun: "2025", provinsi: "JAWA TENGAH", kabkota: "SEMARANG", kecamatan: "BANYUMANIK", desa: "MAJU JAYA", pembaruan: "1 Kali", pemanf_aktif: "Ya", pemanf_jenis: "Perencanaan" },
+            { id: "2002", Status: "Sesuai", status_kelengkapan: "Lengkap", perbaikan: "Sudah", tahun: "2025", provinsi: "JAWA TENGAH", kabkota: "SEMARANG", kecamatan: "BANYUMANIK", desa: "MAJU JAYA", pembaruan: "2 Kali", pemanf_aktif: "Ya", pemanf_jenis: "Intervensi" },
+            { id: "3009", Status: "Belum Tervalidasi", status_kelengkapan: "Lengkap", perbaikan: "-", tahun: "2026", provinsi: "BANTEN", kabkota: "TANGERANG", kecamatan: "CISAUK", desa: "SUKA MAKMUR", pembaruan: "2 Kali", pemanf_aktif: "Ya", pemanf_jenis: "Perencanaan" },
+            { id: "5003", Status: "Belum Tervalidasi", status_kelengkapan: "Belum Lengkap", perbaikan: "-", tahun: "2025", provinsi: "JAWA TIMUR", kabkota: "SURABAYA", kecamatan: "GUBENG", desa: "AIRLANGGA", pembaruan: "", pemanf_aktif: "Ya", pemanf_jenis: "Perencanaan" }
+        ];
+
+        function cleanName(val) {
+            if (!val) return '';
+            let name = val.trim().toUpperCase()
+                .replace(/^KABUPATEN\s+/i, '')
+                .replace(/^KOTA\s+/i, '');
+
+            if (
+                name === "DAERAH ISTIMEWA YOGYAKARTA" || 
+                name === "DI YOGYAKARTA" || 
+                name === "D.I. YOGYAKARTA" || 
+                name === "D.I YOGYAKARTA" || 
+                name === "DIY" || 
+                name === "DI. YOGYAKARTA"
+            ) {
+                return "DI YOGYAKARTA";
+            }
+            return name;
+        }
+
+        function toTitleCase(str) {
+            if (!str) return '';
+            let formatted = str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+            if (formatted.startsWith('Di ')) {
+                formatted = 'DI ' + formatted.slice(3);
+            }
+            if (formatted.startsWith('Dki ')) {
+                formatted = 'DKI ' + formatted.slice(4);
+            }
+            return formatted;
+        }
+
+        window.onload = function() {
+            google.charts.load('current', {'packages':['geochart']});
+            google.charts.setOnLoadCallback(initializeDataConnection);
+        };
+
+        async function initializeDataConnection() {
+            const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSlFHMMpEqDnDL8nOekIR6KTW0iORfL22yXo8k7dMXPsxfJl38vk7yIeRAANhceJCn790hKxtpSpDxT/pubhtml?gid=0&single=true";
+            const csvUrl = sheetUrl.replace('/pubhtml', '/pub').replace('gid=0&single=true', 'gid=0&single=true&output=csv');
+            const statusLabel = document.getElementById('data-status');
+
+            try {
+                const response = await fetch(csvUrl);
+                if (!response.ok) throw new Error("Gagal mengunduh CSV langsung.");
+                
+                const csvText = await response.text();
+                Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        if (results.data && results.data.length > 0) {
+                            processRawData(results.data);
+                            statusLabel.className = "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 backdrop-blur";
+                            statusLabel.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Data Terhubung Live`;
+                        } else {
+                            throw new Error("CSV kosong atau tidak terstruktur.");
+                        }
+                    },
+                    error: function() {
+                        throw new Error("Gagal parsing CSV.");
+                    }
+                });
+            } catch (err) {
+                console.warn("Menggunakan Fallback Dataset Simulation:", err.message);
+                processRawData(fallbackDatabase);
+                statusLabel.className = "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-200 border border-indigo-400/30 backdrop-blur";
+                statusLabel.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-indigo-300"></span> Fallback Active`;
+            }
+        }
+
+        function processRawData(data) {
+            rawDatabase = data.map(item => {
+                const idKey = Object.keys(item).find(k => k.toLowerCase().includes('id') || k.toLowerCase().includes('lokus'));
+                
+                const statusValKey = Object.keys(item).find(k => {
+                    const keyLower = k.trim().toLowerCase();
+                    return keyLower === 'status' || keyLower === 'status validasi' || keyLower === 'status_validasi' || keyLower === 'validasi';
+                });
+
+                const statusKelengkapanKey = Object.keys(item).find(k => k.toLowerCase().includes('kelengkapan'));
+                const perbaikanKey = Object.keys(item).find(k => k.toLowerCase().includes('perbaikan') && !k.toLowerCase().includes('validasi'));
+                const tahunKey = Object.keys(item).find(k => k.toLowerCase().includes('tahun') || k.toLowerCase().includes('thn'));
+                const provKey = Object.keys(item).find(k => k.toLowerCase() === 'provinsi' || k.toLowerCase() === 'prov');
+                const kabKey = Object.keys(item).find(k => k.toLowerCase().includes('kab') || k.toLowerCase().includes('kota'));
+                const kecKey = Object.keys(item).find(k => k.toLowerCase().includes('kecamatan') || k.toLowerCase() === 'kec');
+                const desaKey = Object.keys(item).find(k => k.toLowerCase().includes('desa') || k.toLowerCase().includes('kelurahan'));
+                
+                const pembaruanKey = Object.keys(item).find(k => k.toLowerCase().includes('pemutakhiran') || k.toLowerCase().includes('pembaruan') || k.toLowerCase().includes('update'));
+                const pemanfJenisKey = Object.keys(item).find(k => k.toLowerCase().includes('jenis pemanfaatan'));
+                const pemanfAktifKey = Object.keys(item).find(k => k.toLowerCase().trim() === 'pemanfaatan' && k !== pemanfJenisKey);
+
+                const rawPembaruan = pembaruanKey && item[pembaruanKey] !== undefined && item[pembaruanKey] !== null ? item[pembaruanKey].toString().trim() : '';
+                const rawPemanfAktif = pemanfAktifKey && item[pemanfAktifKey] !== undefined && item[pemanfAktifKey] !== null ? item[pemanfAktifKey].toString().trim() : '';
+
+                let rawStatusVal = (statusValKey && item[statusValKey]) ? item[statusValKey].toString().trim() : '';
+                let statusVal = "Belum Tervalidasi";
+                if (rawStatusVal.toLowerCase().includes("sesuai")) {
+                    statusVal = "Sesuai";
+                } else if (rawStatusVal.toLowerCase().includes("butuh perbaikan") || (rawStatusVal.toLowerCase().includes("perbaikan") && !rawStatusVal.toLowerCase().includes("ulang"))) {
+                    statusVal = "Butuh Perbaikan";
+                } else if (rawStatusVal.toLowerCase().includes("perlu validasi ulang") || rawStatusVal.toLowerCase().includes("validasi ulang")) {
+                    statusVal = "Perlu Validasi Ulang";
+                } else if (rawStatusVal.toLowerCase().includes("tervalidasi") || rawStatusVal.toLowerCase().includes("belum")) {
+                    statusVal = "Belum Tervalidasi";
+                } else if (rawStatusVal !== '') {
+                    statusVal = toTitleCase(rawStatusVal);
+                }
+
+                let rawKelengkapan = statusKelengkapanKey && item[statusKelengkapanKey] ? item[statusKelengkapanKey].toString().trim() : '';
+                let statusKelengkapan = "Lengkap";
+                if (rawKelengkapan !== '') {
+                    statusKelengkapan = rawKelengkapan.toLowerCase().includes("lengkap") && !rawKelengkapan.toLowerCase().includes("belum") ? "Lengkap" : "Belum Lengkap";
+                } else {
+                    if (rawPembaruan === '' || rawPemanfAktif === '') {
+                        statusKelengkapan = "Belum Lengkap";
+                    }
+                }
+
+                let rawPerbaikan = perbaikanKey && item[perbaikanKey] ? item[perbaikanKey].toString().trim() : '';
+                let perbaikanStatus = "-";
+                if (rawPerbaikan !== '') {
+                    if (rawPerbaikan.toLowerCase().includes("sudah") || rawPerbaikan.toLowerCase() === "ya") {
+                        perbaikanStatus = "Sudah";
+                    } else if (rawPerbaikan.toLowerCase().includes("belum") || rawPerbaikan.toLowerCase() === "tidak") {
+                        perbaikanStatus = "Belum";
+                    } else {
+                        perbaikanStatus = toTitleCase(rawPerbaikan);
+                    }
+                }
+
+                return {
+                    id: (item[idKey || 'id'] || '').toString().trim(),
+                    status_validasi: statusVal,
+                    status_kelengkapan: statusKelengkapan,
+                    perbaikan: perbaikanStatus,
+                    tahun: (item[tahunKey || 'tahun'] || '2025').toString().trim(),
+                    provinsi: cleanName(item[provKey || 'provinsi']),
+                    kabkota: cleanName(item[kabKey || 'kabkota']),
+                    kecamatan: toTitleCase((item[kecKey || 'kecamatan'] || '').trim()),
+                    desa: toTitleCase((item[desaKey || 'desa'] || '').trim()),
+                    pembaruan: rawPembaruan !== '' ? toTitleCase(rawPembaruan) : '',
+                    pemanf_aktif: rawPemanfAktif !== '' ? toTitleCase(rawPemanfAktif) : '',
+                    pemanf_jenis: toTitleCase((item[pemanfJenisKey || 'pemanf_jenis'] || '').trim())
+                };
+            }).filter(item => item.id !== "");
+
+            populateFilterOptions();
+            onFilterChange();
+        }
+
+        function populateFilterOptions() {
+            const selectProv = document.getElementById('filter-provinsi');
+            const selectValProv = document.getElementById('filter-val-provinsi');
+            
+            const provinces = Object.keys(totalRegenciesByProvince).sort();
+            
+            selectProv.innerHTML = '<option value="all">Semua Provinsi</option>';
+            if (selectValProv) selectValProv.innerHTML = '<option value="all">Semua Provinsi</option>';
+
+            provinces.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p;
+                opt.textContent = toTitleCase(p);
+                selectProv.appendChild(opt);
+
+                if (selectValProv) {
+                    const optVal = document.createElement('option');
+                    optVal.value = p;
+                    optVal.textContent = toTitleCase(p);
+                    selectValProv.appendChild(optVal);
+                }
+            });
+        }
+
+        function onProvinsiFilterChange() {
+            const selectProv = document.getElementById('filter-provinsi').value;
+            const selectKab = document.getElementById('filter-kabkota');
+            
+            if (selectProv === 'all') {
+                selectKab.innerHTML = '<option value="all">Semua Kab / Kota</option>';
+                selectKab.disabled = true;
+            } else {
+                selectKab.disabled = false;
+                const regencies = [...new Set(
+                    rawDatabase
+                        .filter(item => item.provinsi === selectProv)
+                        .map(item => item.kabkota)
+                )].filter(Boolean).sort();
+
+                selectKab.innerHTML = '<option value="all">Semua Kab / Kota</option>';
+                regencies.forEach(r => {
+                    const opt = document.createElement('option');
+                    opt.value = r;
+                    opt.textContent = toTitleCase(r);
+                    selectKab.appendChild(opt);
+                });
+            }
+            onFilterChange();
+        }
+
+        function onFilterChange() {
+            const filterStatusVal = document.getElementById('filter-status-validasi').value;
+            const filterTahun = document.getElementById('filter-tahun').value;
+            const filterProv = document.getElementById('filter-provinsi').value;
+            const filterKab = document.getElementById('filter-kabkota').value;
+
+            filteredDatabase = rawDatabase.filter(item => {
+                const matchStatusVal = (filterStatusVal === 'all') || (item.status_validasi === filterStatusVal);
+                const matchTahun = (filterTahun === 'all') || (item.tahun === filterTahun);
+                const matchProv = (filterProv === 'all') || (item.provinsi === filterProv);
+                const matchKab = (filterKab === 'all') || (item.kabkota === filterKab);
+                return matchStatusVal && matchTahun && matchProv && matchKab;
+            });
+
+            updateKpis(filterTahun, filterProv, filterKab);
+            renderCharts();
+            renderKabkotaList();
+            renderRekapTable();
+            renderAdminRekapTable();
+            
+            currentTablePage = 1;
+            renderMainTable();
+
+            performDuplicateAudit();
+            performAnomaliesAudits();
+            performValidationAudit();
+        }
+
+        function updateKpis(tahunOpt, provOpt, kabOpt) {
+            const uniqueLokusIds = new Set(filteredDatabase.map(item => item.id));
+            const totalLokusCount = uniqueLokusIds.size;
+            document.getElementById('kpi-total-lokus').textContent = totalLokusCount.toLocaleString('id-ID');
+
+            let targetPerKab = 4;
+            let badgeLabel = "4 per Kab/Kota";
+            let titleLabel = "Capaian Akumulasi";
+
+            if (tahunOpt === "2025") {
+                targetPerKab = 1;
+                badgeLabel = "1 per Kab/Kota";
+                titleLabel = "Capaian Target 2025";
+            } else if (tahunOpt === "2026") {
+                targetPerKab = 3;
+                badgeLabel = "3 per Kab/Kota";
+                titleLabel = "Capaian Target 2026";
+            }
+
+            document.getElementById('kpi-target-title').textContent = titleLabel;
+            document.getElementById('kpi-target-badge').textContent = badgeLabel;
+
+            let regenciesCount = 514;
+            if (provOpt !== "all") {
+                if (kabOpt !== "all") {
+                    regenciesCount = 1;
+                } else {
+                    regenciesCount = totalRegenciesByProvince[provOpt] || 10;
+                }
+            }
+
+            const totalTargetRequired = regenciesCount * targetPerKab;
+            document.getElementById('kpi-capaian-target').textContent = totalTargetRequired.toLocaleString('id-ID');
+            document.getElementById('kpi-capaian-aktual').textContent = totalLokusCount.toLocaleString('id-ID');
+
+            const percentage = totalTargetRequired > 0 ? Math.min(100, Math.round((totalLokusCount / totalTargetRequired) * 100)) : 0;
+            document.getElementById('kpi-capaian-persen').textContent = `${percentage}%`;
+            
+            const progressBar = document.getElementById('kpi-progress-bar');
+            progressBar.style.width = `${percentage}%`;
+            progressBar.className = "h-full rounded-full transition-all duration-500 " + 
+                (percentage === 100 ? "bg-emerald-500" : (percentage >= 60 ? "bg-sky-500" : "bg-amber-500"));
+        }
+
+        function renderCharts() {
+            renderTrenChart();
+            renderFrekuensiChart();
+            renderJenisPemanfaatanChart();
+            renderIntensitasChart();
+            drawGeoChart();
+        }
+
+        function renderTrenChart() {
+            const ctx = document.getElementById('chart-tren-tahun').getContext('2d');
+            const data2025 = new Set(rawDatabase.filter(item => item.tahun === '2025').map(r => r.id)).size;
+            const data2026Combined = new Set(rawDatabase.filter(item => item.tahun === '2025' || item.tahun === '2026').map(r => r.id)).size;
+
+            if (chartTren) chartTren.destroy();
+
+            chartTren = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Th. 2025', 'Th. 2026'],
+                    datasets: [{
+                        label: 'Lokus Terbentuk (Akumulatif)',
+                        data: [data2025, data2026Combined],
+                        borderColor: '#0284c7',
+                        backgroundColor: 'rgba(2, 132, 199, 0.12)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#0284c7',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                plugins: [ChartDataLabels],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            color: '#0369a1',
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 6,
+                            font: { weight: 'bold', size: 11 },
+                            formatter: (val) => val.toLocaleString('id-ID')
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { display: false, suggestedMax: data2026Combined * 1.15 }
+                    }
+                }
+            });
+        }
+
+        function renderFrekuensiChart() {
+            const ctx = document.getElementById('chart-frekuensi-update').getContext('2d');
+            const uniqueRecords = [];
+            const seenIds = new Set();
+            filteredDatabase.forEach(item => {
+                if (!seenIds.has(item.id)) {
+                    seenIds.add(item.id);
+                    uniqueRecords.push(item);
+                }
+            });
+
+            const updateCounts = {};
+            uniqueRecords.forEach(item => {
+                const label = item.pembaruan || 'Tidak Ada Keterangan';
+                updateCounts[label] = (updateCounts[label] || 0) + 1;
+            });
+
+            const sortedCategories = Object.entries(updateCounts).sort((a, b) => b[1] - a[1]);
+            const labels = sortedCategories.map(x => x[0]);
+            const values = sortedCategories.map(x => x[1]);
+
+            if (chartFrekuensi) chartFrekuensi.destroy();
+
+            chartFrekuensi = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 8,
+                        maxBarThickness: 40
+                    }]
+                },
+                plugins: [ChartDataLabels],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            color: '#1e3a8a',
+                            anchor: 'end',
+                            align: 'top',
+                            font: { weight: 'bold', size: 11 },
+                            formatter: (val) => val.toLocaleString('id-ID')
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { display: false, suggestedMax: (Math.max(...values, 10)) * 1.15 }
+                    }
+                }
+            });
+        }
+
+        function renderJenisPemanfaatanChart() {
+            const ctx = document.getElementById('chart-jenis-pemanfaatan').getContext('2d');
+            const activityGroups = {};
+            filteredDatabase.forEach(item => {
+                const actType = item.pemanf_jenis ? item.pemanf_jenis.trim() : '';
+                const isUtilized = ['Ya', 'YA', 'ya', 'sudah', 'aktif'].some(kw => (item.pemanf_aktif || '').toLowerCase().includes(kw));
+
+                if (actType && isUtilized) {
+                    if (!activityGroups[actType]) activityGroups[actType] = new Set();
+                    activityGroups[actType].add(item.id);
+                }
+            });
+
+            const categories = Object.keys(activityGroups).sort();
+            const values = categories.map(cat => activityGroups[cat].size);
+
+            if (chartPemanfaatan) chartPemanfaatan.destroy();
+
+            chartPemanfaatan = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: '#0284c7',
+                        borderRadius: 8,
+                        maxBarThickness: 40
+                    }]
+                },
+                plugins: [ChartDataLabels],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            color: '#0369a1',
+                            anchor: 'end',
+                            align: 'top',
+                            font: { weight: 'bold', size: 11 },
+                            formatter: (val) => val.toLocaleString('id-ID')
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { display: false, suggestedMax: (Math.max(...values, 10)) * 1.15 }
+                    }
+                }
+            });
+        }
+
+        function renderIntensitasChart() {
+            const ctx = document.getElementById('chart-intensitas-pemanfaatan').getContext('2d');
+            const idToActivities = {};
+            const allUniqueIds = new Set(filteredDatabase.map(item => item.id));
+            allUniqueIds.forEach(uid => idToActivities[uid] = new Set());
+
+            filteredDatabase.forEach(item => {
+                const actType = item.pemanf_jenis ? item.pemanf_jenis.trim() : '';
+                const isUtilized = ['Ya', 'YA', 'ya', 'sudah', 'aktif'].some(kw => (item.pemanf_aktif || '').toLowerCase().includes(kw));
+
+                if (actType && isUtilized) {
+                    idToActivities[item.id].add(actType);
+                }
+            });
+
+            let count0 = 0, count1 = 0, count2 = 0, count3 = 0;
+            Object.values(idToActivities).forEach(activitySet => {
+                const size = activitySet.size;
+                if (size === 0) count0++;
+                else if (size === 1) count1++;
+                else if (size === 2) count2++;
+                else if (size >= 3) count3++;
+            });
+
+            if (chartIntensitas) chartIntensitas.destroy();
+
+            chartIntensitas = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Belum Ada', '1 Jenis', '2 Jenis', '3 Jenis atau Lebih'],
+                    datasets: [{
+                        data: [count0, count1, count2, count3],
+                        backgroundColor: ['#94a3b8', '#93c5fd', '#3b82f6', '#1e3a8a'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                plugins: [ChartDataLabels],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } } },
+                        datalabels: {
+                            color: (context) => context.dataIndex === 1 ? '#1e3a8a' : '#ffffff',
+                            font: { weight: 'bold', size: 11 },
+                            formatter: (val) => val > 0 ? val.toLocaleString('id-ID') : ''
+                        }
+                    }
+                }
+            });
+        }
+
+        function drawGeoChart() {
+            if (typeof google === 'undefined' || !google.visualization || typeof google.visualization.DataTable !== 'function') return;
+
+            const provinceMapOfUniqueIds = {};
+            filteredDatabase.forEach(item => {
+                if (!provinceMapOfUniqueIds[item.provinsi]) provinceMapOfUniqueIds[item.provinsi] = new Set();
+                provinceMapOfUniqueIds[item.provinsi].add(item.id);
+            });
+
+            const mapRows = [];
+            Object.keys(provinceIsoMapping).forEach(provKey => {
+                const isoCode = provinceIsoMapping[provKey];
+                const activeCount = provinceMapOfUniqueIds[provKey] ? provinceMapOfUniqueIds[provKey].size : 0;
+                const targetScale = (totalRegenciesByProvince[provKey] || 10) * 4;
+                const percentage = targetScale > 0 ? Math.round((activeCount / targetScale) * 100) : 0;
+
+                mapRows.push([isoCode, toTitleCase(provKey), percentage, activeCount]);
+            });
+
+            const dataTable = new google.visualization.DataTable();
+            dataTable.addColumn('string', 'Region');
+            dataTable.addColumn('string', 'Provinsi');
+            dataTable.addColumn('number', 'Capaian Target (%)');
+            dataTable.addColumn('number', 'Jumlah Lokus');
+
+            dataTable.addRows(mapRows);
+
+            const options = {
+                region: 'ID',
+                resolution: 'provinces',
+                colorAxis: { colors: ['#e0f2fe', '#0ea5e9', '#1e3a8a'] },
+                backgroundColor: 'transparent',
+                datalessRegionColor: '#f1f5f9',
+                defaultColor: '#f1f5f9',
+                legend: { textStyle: { color: '#475569', fontSize: 10 } }
+            };
+
+            const chart = new google.visualization.GeoChart(document.getElementById('geochart-canvas'));
+            chart.draw(dataTable, options);
+        }
+
+        function renderKabkotaList() {
+            const container = document.getElementById('kabkota-sebaran-list');
+            const searchQuery = document.getElementById('search-kabkota').value.toLowerCase().trim();
+
+            const kabkotaMap = {};
+            filteredDatabase.forEach(item => {
+                if (!kabkotaMap[item.kabkota]) {
+                    kabkotaMap[item.kabkota] = {
+                        name: item.kabkota,
+                        province: item.provinsi,
+                        ids: new Set()
+                    };
+                }
+                kabkotaMap[item.kabkota].ids.add(item.id);
+            });
+
+            const listItems = Object.values(kabkotaMap)
+                .map(item => ({
+                    name: toTitleCase(item.name),
+                    province: toTitleCase(item.province),
+                    count: item.ids.size
+                }))
+                .filter(item => item.name.toLowerCase().includes(searchQuery) || item.province.toLowerCase().includes(searchQuery))
+                .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+
+            container.innerHTML = '';
+            
+            if (listItems.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-slate-400 font-medium text-xs">
+                        <i class="fa-solid fa-folder-open text-xl mb-1.5 block"></i>
+                        Tidak ada Kab / Kota yang sesuai dengan kriteria pencarian.
+                    </div>`;
+                return;
+            }
+
+            const maxVal = Math.max(...listItems.map(x => x.count), 1);
+
+            listItems.forEach(item => {
+                const widthPercent = Math.min(100, Math.round((item.count / maxVal) * 100));
+                const row = document.createElement('div');
+                row.className = "flex items-center justify-between p-3 bg-white border border-slate-150 rounded-xl shadow-sm hover:border-slate-300 transition-all";
+                row.innerHTML = `
+                    <div class="flex items-center gap-3 flex-1 min-w-0 pr-4">
+                        <div class="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 shrink-0">
+                            <i class="fa-solid fa-location-dot text-xs"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-bold text-slate-800 truncate">${item.name} <span class="text-slate-400 font-medium">(${item.province})</span></p>
+                            <div class="w-full bg-slate-100 rounded-full h-1.5 mt-1 max-w-[200px]">
+                                <div class="bg-sky-500 h-1.5 rounded-full" style="width: ${widthPercent}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <span class="text-xs font-extrabold text-sky-600">${item.count}</span>
+                        <span class="text-[10px] text-slate-400 font-bold block">Lokus</span>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function renderRekapTable() {
+            const tbody = document.getElementById('tabel-rekap-body');
+            const tfoot = document.getElementById('tabel-rekap-foot');
+            if (!tbody) return;
+
+            const filterTahun = document.getElementById('filter-tahun') ? document.getElementById('filter-tahun').value : 'all';
+            const filterProv = document.getElementById('filter-provinsi') ? document.getElementById('filter-provinsi').value : 'all';
+
+            let targetPerKab = 4;
+            if (filterTahun === "2025") {
+                targetPerKab = 1;
+            } else if (filterTahun === "2026") {
+                targetPerKab = 3;
+            }
+
+            const uniqueLokusMap = new Map();
+            filteredDatabase.forEach(item => {
+                if (!uniqueLokusMap.has(item.id)) {
+                    uniqueLokusMap.set(item.id, item);
+                }
+            });
+
+            const rekapMap = {};
+            const allProvKeys = Object.keys(totalRegenciesByProvince);
+
+            allProvKeys.forEach(provKey => {
+                const provTitle = toTitleCase(provKey);
+                const regencyCount = totalRegenciesByProvince[provKey] || 0;
+                rekapMap[provKey] = {
+                    provinsi: provTitle,
+                    provKey: provKey,
+                    target: regencyCount * targetPerKab,
+                    sesuai: 0,
+                    butuhPerbaikan: 0,
+                    buktiDukungBelumLengkap: 0,
+                    total: 0
+                };
+            });
+
+            uniqueLokusMap.forEach(item => {
+                const provKey = item.provinsi ? cleanName(item.provinsi) : '';
+                if (provKey && rekapMap[provKey]) {
+                    rekapMap[provKey].total++;
+                    if (item.status_validasi === 'Sesuai') rekapMap[provKey].sesuai++;
+                    else if (item.status_validasi === 'Butuh Perbaikan') rekapMap[provKey].butuhPerbaikan++;
+
+                    if (item.status_kelengkapan === 'Belum Lengkap') rekapMap[provKey].buktiDukungBelumLengkap++;
+                } else if (provKey) {
+                    if (!rekapMap[provKey]) {
+                        rekapMap[provKey] = {
+                            provinsi: toTitleCase(provKey),
+                            provKey: provKey,
+                            target: 0,
+                            sesuai: 0,
+                            butuhPerbaikan: 0,
+                            buktiDukungBelumLengkap: 0,
+                            total: 0
+                        };
+                    }
+                    rekapMap[provKey].total++;
+                    if (item.status_validasi === 'Sesuai') rekapMap[provKey].sesuai++;
+                    else if (item.status_validasi === 'Butuh Perbaikan') rekapMap[provKey].butuhPerbaikan++;
+
+                    if (item.status_kelengkapan === 'Belum Lengkap') rekapMap[provKey].buktiDukungBelumLengkap++;
+                }
+            });
+
+            let rekapList = Object.values(rekapMap).sort((a, b) => a.provinsi.localeCompare(b.provinsi));
+
+            if (filterProv !== 'all') {
+                rekapList = rekapList.filter(r => r.provKey === filterProv);
+            }
+
+            if (searchRekapText) {
+                rekapList = rekapList.filter(r => r.provinsi.toLowerCase().includes(searchRekapText));
+            }
+
+            tbody.innerHTML = '';
+
+            if (rekapList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-8 text-slate-400 font-medium text-xs">
+                            <i class="fa-solid fa-folder-open text-xl mb-1.5 block"></i>
+                            Tidak ada data rekap status lokus yang sesuai.
+                        </td>
+                    </tr>`;
+                if (tfoot) tfoot.innerHTML = '';
+                return;
+            }
+
+            let sumTarget = 0;
+            let sumSesuai = 0;
+            let sumButuhPerbaikan = 0;
+            let sumBuktiBelumLengkap = 0;
+            let sumTotal = 0;
+
+            rekapList.forEach((item, index) => {
+                sumTarget += item.target;
+                sumSesuai += item.sesuai;
+                sumButuhPerbaikan += item.butuhPerbaikan;
+                sumBuktiBelumLengkap += item.buktiDukungBelumLengkap;
+                sumTotal += item.total;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/50 transition-all text-xs";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-center font-bold text-slate-400">${index + 1}</td>
+                    <td class="py-3 px-4 font-bold text-slate-800">${item.provinsi}</td>
+                    <td class="py-3 px-4 text-center font-extrabold text-slate-900 bg-slate-100/50">${item.total.toLocaleString('id-ID')}</td>
+                    <td class="py-3 px-4 text-center font-bold text-sky-700 bg-sky-50/40">${item.target.toLocaleString('id-ID')}</td>
+                    <td class="py-3 px-4 text-center font-semibold text-emerald-700 bg-emerald-50/20">${item.sesuai.toLocaleString('id-ID')}</td>
+                    <td class="py-3 px-4 text-center font-semibold text-rose-700 bg-rose-50/20">${item.butuhPerbaikan.toLocaleString('id-ID')}</td>
+                    <td class="py-3 px-4 text-center font-semibold text-orange-700 bg-orange-50/20">${item.buktiDukungBelumLengkap.toLocaleString('id-ID')}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (tfoot) {
+                tfoot.innerHTML = `
+                    <tr class="text-xs">
+                        <td colspan="2" class="py-3.5 px-4 text-slate-900 font-extrabold uppercase tracking-wider text-right">Total Akumulasi</td>
+                        <td class="py-3.5 px-4 text-center font-black text-slate-900 bg-slate-200/50">${sumTotal.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 text-center font-extrabold text-sky-700 bg-sky-100/60">${sumTarget.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 text-center font-extrabold text-emerald-700 bg-emerald-50/40">${sumSesuai.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 text-center font-extrabold text-rose-700 bg-rose-50/40">${sumButuhPerbaikan.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 text-center font-extrabold text-orange-700 bg-orange-50/40">${sumBuktiBelumLengkap.toLocaleString('id-ID')}</td>
+                    </tr>
+                `;
+            }
+        }
+
+        function onSearchTabelRekap() {
+            searchRekapText = document.getElementById('search-tabel-rekap').value.toLowerCase().trim();
+            renderRekapTable();
+        }
+
+        function exportRekapToExcel() {
+            const filterTahun = document.getElementById('filter-tahun') ? document.getElementById('filter-tahun').value : 'all';
+            let targetPerKab = 4;
+            if (filterTahun === "2025") targetPerKab = 1;
+            else if (filterTahun === "2026") targetPerKab = 3;
+
+            const uniqueLokusMap = new Map();
+            filteredDatabase.forEach(item => {
+                if (!uniqueLokusMap.has(item.id)) {
+                    uniqueLokusMap.set(item.id, item);
+                }
+            });
+
+            const rekapMap = {};
+            Object.keys(totalRegenciesByProvince).forEach(provKey => {
+                const provTitle = toTitleCase(provKey);
+                const regCount = totalRegenciesByProvince[provKey] || 0;
+                rekapMap[provKey] = {
+                    "No": 0,
+                    "Provinsi": provTitle,
+                    "Total Lokus": 0,
+                    "Target": regCount * targetPerKab,
+                    "Sesuai": 0,
+                    "Butuh Perbaikan": 0,
+                    "Bukti Dukung Belum lengkap": 0
+                };
+            });
+
+            uniqueLokusMap.forEach(item => {
+                const provKey = item.provinsi ? cleanName(item.provinsi) : '';
+                if (provKey && rekapMap[provKey]) {
+                    rekapMap[provKey]["Total Lokus"]++;
+                    if (item.status_validasi === 'Sesuai') rekapMap[provKey]["Sesuai"]++;
+                    else if (item.status_validasi === 'Butuh Perbaikan') rekapMap[provKey]["Butuh Perbaikan"]++;
+
+                    if (item.status_kelengkapan === 'Belum Lengkap') rekapMap[provKey]["Bukti Dukung Belum lengkap"]++;
+                }
+            });
+
+            const dataArray = Object.values(rekapMap)
+                .sort((a, b) => a.Provinsi.localeCompare(b.Provinsi))
+                .map((row, idx) => {
+                    row["No"] = idx + 1;
+                    return row;
+                });
+
+            const worksheet = XLSX.utils.json_to_sheet(dataArray);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Status Lokus");
+            XLSX.writeFile(workbook, `Rekap_Status_Lokus_RumahDataKu_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function renderAdminRekapTable() {
+            const tbody = document.getElementById('tabel-admin-rekap-body');
+            const tfoot = document.getElementById('tabel-admin-rekap-foot');
+            if (!tbody) return;
+
+            const filterProv = document.getElementById('filter-provinsi') ? document.getElementById('filter-provinsi').value : 'all';
+
+            const uniqueLokusMap = new Map();
+            rawDatabase.forEach(item => {
+                if (!uniqueLokusMap.has(item.id)) {
+                    uniqueLokusMap.set(item.id, item);
+                }
+            });
+
+            const adminRekapMap = {};
+            const allProvKeys = Object.keys(totalRegenciesByProvince);
+
+            allProvKeys.forEach(provKey => {
+                adminRekapMap[provKey] = {
+                    provinsi: toTitleCase(provKey),
+                    provKey: provKey,
+                    perluValidasiUlang: 0,
+                    belumTervalidasi: 0
+                };
+            });
+
+            uniqueLokusMap.forEach(item => {
+                const provKey = item.provinsi ? cleanName(item.provinsi) : '';
+                if (provKey && adminRekapMap[provKey]) {
+                    if (item.status_validasi === 'Perlu Validasi Ulang') adminRekapMap[provKey].perluValidasiUlang++;
+                    else if (item.status_validasi === 'Belum Tervalidasi') adminRekapMap[provKey].belumTervalidasi++;
+                } else if (provKey) {
+                    if (!adminRekapMap[provKey]) {
+                        adminRekapMap[provKey] = {
+                            provinsi: toTitleCase(provKey),
+                            provKey: provKey,
+                            perluValidasiUlang: 0,
+                            belumTervalidasi: 0
+                        };
+                    }
+                    if (item.status_validasi === 'Perlu Validasi Ulang') adminRekapMap[provKey].perluValidasiUlang++;
+                    else if (item.status_validasi === 'Belum Tervalidasi') adminRekapMap[provKey].belumTervalidasi++;
+                }
+            });
+
+            let adminRekapList = Object.values(adminRekapMap).sort((a, b) => a.provinsi.localeCompare(b.provinsi));
+
+            if (filterProv !== 'all') {
+                adminRekapList = adminRekapList.filter(r => r.provKey === filterProv);
+            }
+
+            if (searchAdminRekapText) {
+                adminRekapList = adminRekapList.filter(r => r.provinsi.toLowerCase().includes(searchAdminRekapText));
+            }
+
+            tbody.innerHTML = '';
+
+            if (adminRekapList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center py-8 text-slate-400 font-medium text-xs">
+                            <i class="fa-solid fa-folder-open text-xl mb-1.5 block"></i>
+                            Tidak ada data rekap khusus admin yang sesuai.
+                        </td>
+                    </tr>`;
+                if (tfoot) tfoot.innerHTML = '';
+                return;
+            }
+
+            let sumPerluVal = 0;
+            let sumBelumVal = 0;
+
+            adminRekapList.forEach((item, index) => {
+                sumPerluVal += item.perluValidasiUlang;
+                sumBelumVal += item.belumTervalidasi;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-purple-50/40 transition-all text-xs";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-center font-bold text-slate-400">${index + 1}</td>
+                    <td class="py-3 px-4 font-bold text-slate-800">${item.provinsi}</td>
+                    <td class="py-3 px-4 text-center font-semibold text-indigo-700 bg-indigo-50/20">${item.perluValidasiUlang.toLocaleString('id-ID')}</td>
+                    <td class="py-3 px-4 text-center font-semibold text-amber-700 bg-amber-50/20">${item.belumTervalidasi.toLocaleString('id-ID')}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (tfoot) {
+                tfoot.innerHTML = `
+                    <tr class="text-xs">
+                        <td colspan="2" class="py-3.5 px-4 text-slate-900 font-extrabold uppercase tracking-wider text-right">Total Akumulasi Admin</td>
+                        <td class="py-3.5 px-4 text-center font-extrabold text-indigo-700 bg-indigo-50/40">${sumPerluVal.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 text-center font-extrabold text-amber-700 bg-amber-50/40">${sumBelumVal.toLocaleString('id-ID')}</td>
+                    </tr>
+                `;
+            }
+        }
+
+        function onSearchTabelAdminRekap() {
+            searchAdminRekapText = document.getElementById('search-tabel-admin-rekap').value.toLowerCase().trim();
+            renderAdminRekapTable();
+        }
+
+        function exportAdminRekapToExcel() {
+            const uniqueLokusMap = new Map();
+            rawDatabase.forEach(item => {
+                if (!uniqueLokusMap.has(item.id)) {
+                    uniqueLokusMap.set(item.id, item);
+                }
+            });
+
+            const adminRekapMap = {};
+            Object.keys(totalRegenciesByProvince).forEach(provKey => {
+                const provTitle = toTitleCase(provKey);
+                adminRekapMap[provKey] = {
+                    "No": 0,
+                    "Provinsi": provTitle,
+                    "Perlu Validasi Ulang": 0,
+                    "Belum Tervalidasi": 0
+                };
+            });
+
+            uniqueLokusMap.forEach(item => {
+                const provKey = item.provinsi ? cleanName(item.provinsi) : '';
+                if (provKey && adminRekapMap[provKey]) {
+                    if (item.status_validasi === 'Perlu Validasi Ulang') adminRekapMap[provKey]["Perlu Validasi Ulang"]++;
+                    else if (item.status_validasi === 'Belum Tervalidasi') adminRekapMap[provKey]["Belum Tervalidasi"]++;
+                }
+            });
+
+            const dataArray = Object.values(adminRekapMap)
+                .sort((a, b) => a.Provinsi.localeCompare(b.Provinsi))
+                .map((row, idx) => {
+                    row["No"] = idx + 1;
+                    return row;
+                });
+
+            const worksheet = XLSX.utils.json_to_sheet(dataArray);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Validasi Admin");
+            XLSX.writeFile(workbook, `Rekap_Validasi_Khusus_Admin_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function renderMainTable() {
+            const tbody = document.getElementById('tabel-lokus-body');
+            tbody.innerHTML = '';
+
+            let dataToDisplay = filteredDatabase;
+            if (searchFilterText) {
+                dataToDisplay = dataToDisplay.filter(item => 
+                    item.kecamatan.toLowerCase().includes(searchFilterText) ||
+                    item.desa.toLowerCase().includes(searchFilterText) ||
+                    item.kabkota.toLowerCase().includes(searchFilterText) ||
+                    item.provinsi.toLowerCase().includes(searchFilterText) ||
+                    item.id.toLowerCase().includes(searchFilterText)
+                );
+            }
+
+            const totalRows = dataToDisplay.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage) || 1;
+            
+            if (currentTablePage > totalPages) currentTablePage = totalPages;
+            if (currentTablePage < 1) currentTablePage = 1;
+
+            const startIndex = (currentTablePage - 1) * rowsPerPage;
+            const pageData = dataToDisplay.slice(startIndex, startIndex + rowsPerPage);
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-8 text-slate-400 font-medium">
+                            <i class="fa-solid fa-folder-open text-2xl mb-2 block"></i>
+                            Tidak ada data lokus yang ditemukan.
+                        </td>
+                    </tr>`;
+            } else {
+                pageData.forEach((item, index) => {
+                    const globalIdx = startIndex + index + 1;
+                    let badgeClass = "bg-slate-100 text-slate-700 border-slate-200";
+                    if (item.status_validasi === "Sesuai") badgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                    else if (item.status_validasi === "Butuh Perbaikan") badgeClass = "bg-rose-50 text-rose-700 border-rose-200";
+                    else if (item.status_validasi === "Perlu Validasi Ulang") badgeClass = "bg-indigo-50 text-indigo-700 border-indigo-200";
+                    else if (item.status_validasi === "Belum Tervalidasi") badgeClass = "bg-amber-50 text-amber-700 border-amber-200";
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50/80 transition-all";
+                    tr.innerHTML = `
+                        <td class="py-3.5 px-4 text-center font-bold text-slate-400">${globalIdx}</td>
+                        <td class="py-3.5 px-4">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold border ${badgeClass}">
+                                ${item.status_validasi}
+                            </span>
+                        </td>
+                        <td class="py-3.5 px-4 font-bold text-slate-600">${item.tahun}</td>
+                        <td class="py-3.5 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
+                        <td class="py-3.5 px-4 font-medium text-slate-700">${toTitleCase(item.kabkota)}</td>
+                        <td class="py-3.5 px-4 text-slate-600">${item.kecamatan || '-'}</td>
+                        <td class="py-3.5 px-4 text-slate-600 font-medium">${item.desa || '-'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            const endIdx = Math.min(startIndex + rowsPerPage, totalRows);
+            document.getElementById('tabel-pagination-info').textContent = 
+                `Menampilkan ${totalRows > 0 ? startIndex + 1 : 0}-${endIdx} dari ${totalRows} baris`;
+
+            document.getElementById('btn-prev-page').disabled = (currentTablePage <= 1);
+            document.getElementById('btn-next-page').disabled = (currentTablePage >= totalPages);
+        }
+
+        function changePage(direction) {
+            currentTablePage += direction;
+            renderMainTable();
+        }
+
+        function onSearchTabelUtama() {
+            searchFilterText = document.getElementById('search-tabel-utama').value.toLowerCase().trim();
+            currentTablePage = 1;
+            renderMainTable();
+        }
+
+        function exportToExcel() {
+            const worksheet = XLSX.utils.json_to_sheet(filteredDatabase);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Daftar Lokus");
+            XLSX.writeFile(workbook, `Detail_Lokus_RumahDataKu_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function performDuplicateAudit() {
+            const groupMap = {};
+            rawDatabase.forEach(item => {
+                const key = `${item.provinsi}|${item.kabkota}|${item.kecamatan}|${item.desa}`;
+                if (!groupMap[key]) groupMap[key] = [];
+                groupMap[key].push(item);
+            });
+
+            duplicateList = [];
+            Object.keys(groupMap).forEach(key => {
+                const items = groupMap[key];
+                if (items.length > 1) {
+                    const uniqueIds = [...new Set(items.map(x => x.id))];
+                    const first = items[0];
+                    duplicateList.push({
+                        provinsi: first.provinsi,
+                        kabkota: first.kabkota,
+                        kecamatan: first.kecamatan,
+                        desa: first.desa,
+                        ids: uniqueIds.join(", "),
+                        totalEntries: items.length,
+                        issue: uniqueIds.length > 1 ? "ID Spasial Berbeda" : "Entri Baris Ganda"
+                    });
+                }
+            });
+
+            renderDuplicatesTable();
+        }
+
+        function renderDuplicatesTable() {
+            const tbody = document.getElementById('tabel-duplikat-body');
+            tbody.innerHTML = '';
+
+            let dataToDisplay = duplicateList;
+            if (searchDupText) {
+                dataToDisplay = dataToDisplay.filter(item =>
+                    item.provinsi.toLowerCase().includes(searchDupText) ||
+                    item.kabkota.toLowerCase().includes(searchDupText) ||
+                    item.desa.toLowerCase().includes(searchDupText) ||
+                    item.ids.toLowerCase().includes(searchDupText)
+                );
+            }
+
+            const totalRows = dataToDisplay.length;
+            const totalPages = Math.ceil(totalRows / dupRowsPerPage) || 1;
+            
+            if (currentDupPage > totalPages) currentDupPage = totalPages;
+            if (currentDupPage < 1) currentDupPage = 1;
+
+            const startIndex = (currentDupPage - 1) * dupRowsPerPage;
+            const pageData = dataToDisplay.slice(startIndex, startIndex + dupRowsPerPage);
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-6 text-amber-700/60 font-medium">
+                            <i class="fa-solid fa-circle-check text-xl mb-1 block text-amber-500"></i>
+                            Tidak ditemukan konflik data duplikat!
+                        </td>
+                    </tr>`;
+            } else {
+                pageData.forEach((item, index) => {
+                    const globalIdx = startIndex + index + 1;
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-amber-50/30 transition-all";
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 text-center font-bold text-amber-600/70">${globalIdx}</td>
+                        <td class="py-3 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
+                        <td class="py-3 px-4 font-medium text-slate-700">${toTitleCase(item.kabkota)}</td>
+                        <td class="py-3 px-4 text-slate-600">${item.kecamatan}</td>
+                        <td class="py-3 px-4 text-slate-800 font-bold">${item.desa}</td>
+                        <td class="py-3 px-4 text-center font-mono font-bold text-amber-800 bg-amber-100/40 rounded-lg">${item.ids}</td>
+                        <td class="py-3 px-4 text-center font-extrabold text-amber-700">${item.totalEntries}</td>
+                        <td class="py-3 px-4">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                                ${item.issue}
+                            </span>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            const endIdx = Math.min(startIndex + dupRowsPerPage, totalRows);
+            document.getElementById('tabel-duplikat-pagination-info').textContent = 
+                `Menampilkan ${totalRows > 0 ? startIndex + 1 : 0}-${endIdx} dari ${totalRows} baris duplikat`;
+
+            document.getElementById('btn-prev-dup-page').disabled = (currentDupPage <= 1);
+            document.getElementById('btn-next-dup-page').disabled = (currentDupPage >= totalPages);
+        }
+
+        function changeDupPage(direction) {
+            currentDupPage += direction;
+            renderDuplicatesTable();
+        }
+
+        function onSearchTabelDuplikat() {
+            searchDupText = document.getElementById('search-tabel-duplikat').value.toLowerCase().trim();
+            currentDupPage = 1;
+            renderDuplicatesTable();
+        }
+
+        function exportDuplicatesToExcel() {
+            const worksheet = XLSX.utils.json_to_sheet(duplicateList);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Audit Duplikat");
+            XLSX.writeFile(workbook, `Audit_Duplikat_Lokus_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function performAnomaliesAudits() {
+            pemanfAnomalyList = [];
+            updateAnomalyList = [];
+            incompleteList = [];
+
+            rawDatabase.forEach(item => {
+                const pAct = item.pemanf_aktif;
+                if (pAct && !['ya', 'tidak'].includes(pAct.toLowerCase())) {
+                    pemanfAnomalyList.push({
+                        id: item.id,
+                        tahun: item.tahun,
+                        provinsi: item.provinsi,
+                        kabkota: item.kabkota,
+                        desa: item.desa,
+                        val: pAct,
+                        recom: "Koreksi nilai menjadi 'Ya' atau 'Tidak'"
+                    });
+                }
+
+                const upd = item.pembaruan;
+                if (upd && !['1 kali', '2 kali', '> 2 kali'].includes(upd.toLowerCase())) {
+                    updateAnomalyList.push({
+                        id: item.id,
+                        tahun: item.tahun,
+                        provinsi: item.provinsi,
+                        kabkota: item.kabkota,
+                        desa: item.desa,
+                        val: upd,
+                        recom: "Sesuaikan dengan format pilihan standar"
+                    });
+                }
+
+                const emptyFields = [];
+                if (!item.pembaruan || item.pembaruan === '') emptyFields.push("Pemutakhiran Data");
+                if (!item.pemanf_aktif || item.pemanf_aktif === '') emptyFields.push("Pemanfaatan Data");
+
+                if (emptyFields.length > 0) {
+                    incompleteList.push({
+                        id: item.id,
+                        tahun: item.tahun,
+                        provinsi: item.provinsi,
+                        kabkota: item.kabkota,
+                        desa: item.desa,
+                        missing: emptyFields.join(", "),
+                        recom: "Lengkapi data indikator yang kosong"
+                    });
+                }
+            });
+
+            renderPemanfAnomaliesTable();
+            renderUpdateAnomaliesTable();
+            renderIncompleteTable();
+        }
+
+        function renderPemanfAnomaliesTable() {
+            const tbody = document.getElementById('tabel-pemanf-body');
+            tbody.innerHTML = '';
+
+            let dataToDisplay = pemanfAnomalyList;
+            if (searchPemanfText) {
+                dataToDisplay = dataToDisplay.filter(item =>
+                    item.id.toLowerCase().includes(searchPemanfText) ||
+                    item.provinsi.toLowerCase().includes(searchPemanfText) ||
+                    item.desa.toLowerCase().includes(searchPemanfText)
+                );
+            }
+
+            const totalRows = dataToDisplay.length;
+            const totalPages = Math.ceil(totalRows / pemanfRowsPerPage) || 1;
+            
+            if (currentPemanfPage > totalPages) currentPemanfPage = totalPages;
+            if (currentPemanfPage < 1) currentPemanfPage = 1;
+
+            const startIndex = (currentPemanfPage - 1) * pemanfRowsPerPage;
+            const pageData = dataToDisplay.slice(startIndex, startIndex + pemanfRowsPerPage);
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-6 text-rose-700/60 font-medium">
+                            <i class="fa-solid fa-circle-check text-xl mb-1 block text-emerald-500"></i>
+                            Tidak ada anomali isian pemanfaatan data.
+                        </td>
+                    </tr>`;
+            } else {
+                pageData.forEach((item, index) => {
+                    const globalIdx = startIndex + index + 1;
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-rose-50/30 transition-all";
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 text-center font-bold text-rose-600/70">${globalIdx}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-slate-800">${item.id}</td>
+                        <td class="py-3 px-4 font-bold text-slate-600">${item.tahun}</td>
+                        <td class="py-3 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
+                        <td class="py-3 px-4 font-medium text-slate-700">${toTitleCase(item.kabkota)}</td>
+                        <td class="py-3 px-4 text-slate-800 font-bold">${item.desa}</td>
+                        <td class="py-3 px-4 text-center font-bold text-rose-700 bg-rose-100/50 rounded-lg">${item.val}</td>
+                        <td class="py-3 px-4 text-slate-600 font-medium">${item.recom}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            const endIdx = Math.min(startIndex + pemanfRowsPerPage, totalRows);
+            document.getElementById('tabel-pemanf-pagination-info').textContent = 
+                `Menampilkan ${totalRows > 0 ? startIndex + 1 : 0}-${endIdx} dari ${totalRows} baris anomali`;
+
+            document.getElementById('btn-prev-pemanf-page').disabled = (currentPemanfPage <= 1);
+            document.getElementById('btn-next-pemanf-page').disabled = (currentPemanfPage >= totalPages);
+        }
+
+        function changePemanfPage(direction) {
+            currentPemanfPage += direction;
+            renderPemanfAnomaliesTable();
+        }
+
+        function onSearchTabelPemanf() {
+            searchPemanfText = document.getElementById('search-tabel-pemanf').value.toLowerCase().trim();
+            currentPemanfPage = 1;
+            renderPemanfAnomaliesTable();
+        }
+
+        function exportPemanfAnomaliesToExcel() {
+            const worksheet = XLSX.utils.json_to_sheet(pemanfAnomalyList);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Anomali Pemanfaatan");
+            XLSX.writeFile(workbook, `Anomali_Pemanfaatan_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function renderUpdateAnomaliesTable() {
+            const tbody = document.getElementById('tabel-update-body');
+            tbody.innerHTML = '';
+
+            let dataToDisplay = updateAnomalyList;
+            if (searchUpdateText) {
+                dataToDisplay = dataToDisplay.filter(item =>
+                    item.id.toLowerCase().includes(searchUpdateText) ||
+                    item.provinsi.toLowerCase().includes(searchUpdateText) ||
+                    item.desa.toLowerCase().includes(searchUpdateText)
+                );
+            }
+
+            const totalRows = dataToDisplay.length;
+            const totalPages = Math.ceil(totalRows / updateRowsPerPage) || 1;
+            
+            if (currentUpdatePage > totalPages) currentUpdatePage = totalPages;
+            if (currentUpdatePage < 1) currentUpdatePage = 1;
+
+            const startIndex = (currentUpdatePage - 1) * updateRowsPerPage;
+            const pageData = dataToDisplay.slice(startIndex, startIndex + updateRowsPerPage);
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-6 text-violet-700/60 font-medium">
+                            <i class="fa-solid fa-circle-check text-xl mb-1 block text-emerald-500"></i>
+                            Tidak ada anomali isian pemutakhiran data.
+                        </td>
+                    </tr>`;
+            } else {
+                pageData.forEach((item, index) => {
+                    const globalIdx = startIndex + index + 1;
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-violet-50/30 transition-all";
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 text-center font-bold text-violet-600/70">${globalIdx}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-slate-800">${item.id}</td>
+                        <td class="py-3 px-4 font-bold text-slate-600">${item.tahun}</td>
+                        <td class="py-3 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
+                        <td class="py-3 px-4 font-medium text-slate-700">${toTitleCase(item.kabkota)}</td>
+                        <td class="py-3 px-4 text-slate-800 font-bold">${item.desa}</td>
+                        <td class="py-3 px-4 text-center font-bold text-violet-700 bg-violet-100/50 rounded-lg">${item.val}</td>
+                        <td class="py-3 px-4 text-slate-600 font-medium">${item.recom}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            const endIdx = Math.min(startIndex + updateRowsPerPage, totalRows);
+            document.getElementById('tabel-update-pagination-info').textContent = 
+                `Menampilkan ${totalRows > 0 ? startIndex + 1 : 0}-${endIdx} dari ${totalRows} baris anomali`;
+
+            document.getElementById('btn-prev-update-page').disabled = (currentUpdatePage <= 1);
+            document.getElementById('btn-next-update-page').disabled = (currentUpdatePage >= totalPages);
+        }
+
+        function changeUpdatePage(direction) {
+            currentUpdatePage += direction;
+            renderUpdateAnomaliesTable();
+        }
+
+        function onSearchTabelUpdate() {
+            searchUpdateText = document.getElementById('search-tabel-update').value.toLowerCase().trim();
+            currentUpdatePage = 1;
+            renderUpdateAnomaliesTable();
+        }
+
+        function exportUpdateAnomaliesToExcel() {
+            const worksheet = XLSX.utils.json_to_sheet(updateAnomalyList);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Anomali Pemutakhiran");
+            XLSX.writeFile(workbook, `Anomali_Pemutakhiran_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function renderIncompleteTable() {
+            const tbody = document.getElementById('tabel-incomplete-body');
+            tbody.innerHTML = '';
+
+            let dataToDisplay = incompleteList;
+            if (searchIncompleteText) {
+                dataToDisplay = dataToDisplay.filter(item =>
+                    item.id.toLowerCase().includes(searchIncompleteText) ||
+                    item.provinsi.toLowerCase().includes(searchIncompleteText) ||
+                    item.desa.toLowerCase().includes(searchIncompleteText)
+                );
+            }
+
+            const totalRows = dataToDisplay.length;
+            const totalPages = Math.ceil(totalRows / incompleteRowsPerPage) || 1;
+            
+            if (currentIncompletePage > totalPages) currentIncompletePage = totalPages;
+            if (currentIncompletePage < 1) currentIncompletePage = 1;
+
+            const startIndex = (currentIncompletePage - 1) * incompleteRowsPerPage;
+            const pageData = dataToDisplay.slice(startIndex, startIndex + incompleteRowsPerPage);
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-6 text-sky-700/60 font-medium">
+                            <i class="fa-solid fa-circle-check text-xl mb-1 block text-emerald-500"></i>
+                            Semua baris data terisi lengkap!
+                        </td>
+                    </tr>`;
+            } else {
+                pageData.forEach((item, index) => {
+                    const globalIdx = startIndex + index + 1;
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-sky-50/30 transition-all";
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 text-center font-bold text-sky-600/70">${globalIdx}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-slate-800">${item.id}</td>
+                        <td class="py-3 px-4 font-bold text-slate-600">${item.tahun}</td>
+                        <td class="py-3 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
+                        <td class="py-3 px-4 font-medium text-slate-700">${toTitleCase(item.kabkota)}</td>
+                        <td class="py-3 px-4 text-slate-800 font-bold">${item.desa}</td>
+                        <td class="py-3 px-4 text-center font-bold text-sky-700 bg-sky-100/50 rounded-lg">${item.missing}</td>
+                        <td class="py-3 px-4 text-slate-600 font-medium">${item.recom}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            const endIdx = Math.min(startIndex + incompleteRowsPerPage, totalRows);
+            document.getElementById('tabel-incomplete-pagination-info').textContent = 
+                `Menampilkan ${totalRows > 0 ? startIndex + 1 : 0}-${endIdx} dari ${totalRows} baris belum lengkap`;
+
+            document.getElementById('btn-prev-incomplete-page').disabled = (currentIncompletePage <= 1);
+            document.getElementById('btn-next-incomplete-page').disabled = (currentIncompletePage >= totalPages);
+        }
+
+        function changeIncompletePage(direction) {
+            currentIncompletePage += direction;
+            renderIncompleteTable();
+        }
+
+        function onSearchTabelIncomplete() {
+            searchIncompleteText = document.getElementById('search-tabel-incomplete').value.toLowerCase().trim();
+            currentIncompletePage = 1;
+            renderIncompleteTable();
+        }
+
+        function exportIncompleteToExcel() {
+            const worksheet = XLSX.utils.json_to_sheet(incompleteList);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Data Belum Lengkap");
+            XLSX.writeFile(workbook, `Data_Belum_Lengkap_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function performValidationAudit() {
+            validationList = rawDatabase.filter(item => 
+                item.status_validasi === "Belum Tervalidasi" || item.status_validasi === "Perlu Validasi Ulang"
+            );
+            renderValidationTable();
+        }
+
+        function renderValidationTable() {
+            const tbody = document.getElementById('tabel-validation-body');
+            tbody.innerHTML = '';
+
+            let dataToDisplay = validationList;
+
+            if (filterValProv !== 'all') {
+                dataToDisplay = dataToDisplay.filter(item => item.provinsi === filterValProv);
+            }
+
+            if (filterValStatusKhusus !== 'all') {
+                dataToDisplay = dataToDisplay.filter(item => item.status_validasi === filterValStatusKhusus);
+            }
+
+            if (searchValidationText) {
+                dataToDisplay = dataToDisplay.filter(item =>
+                    item.id.toLowerCase().includes(searchValidationText) ||
+                    item.provinsi.toLowerCase().includes(searchValidationText) ||
+                    item.kabkota.toLowerCase().includes(searchValidationText) ||
+                    item.desa.toLowerCase().includes(searchValidationText)
+                );
+            }
+
+            const totalRows = dataToDisplay.length;
+            const totalPages = Math.ceil(totalRows / validationRowsPerPage) || 1;
+            
+            if (currentValidationPage > totalPages) currentValidationPage = totalPages;
+            if (currentValidationPage < 1) currentValidationPage = 1;
+
+            const startIndex = (currentValidationPage - 1) * validationRowsPerPage;
+            const pageData = dataToDisplay.slice(startIndex, startIndex + validationRowsPerPage);
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-6 text-indigo-700/60 font-medium">
+                            <i class="fa-solid fa-circle-check text-xl mb-1 block text-emerald-500"></i>
+                            Tidak ada lokus dalam antrean validasi khusus.
+                        </td>
+                    </tr>`;
+            } else {
+                pageData.forEach((item, index) => {
+                    const globalIdx = startIndex + index + 1;
+                    let badgeClass = item.status_validasi === "Perlu Validasi Ulang" ? 
+                        "bg-indigo-100 text-indigo-800 border-indigo-200" : "bg-amber-100 text-amber-800 border-amber-200";
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-indigo-50/30 transition-all";
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 text-center font-bold text-indigo-600/70">${globalIdx}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-slate-800">${item.id}</td>
+                        <td class="py-3 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
+                        <td class="py-3 px-4 font-medium text-slate-700">${toTitleCase(item.kabkota)}</td>
+                        <td class="py-3 px-4 text-slate-600">${item.kecamatan}</td>
+                        <td class="py-3 px-4 text-slate-800 font-bold">${item.desa}</td>
+                        <td class="py-3 px-4">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded text-[10px] font-bold border ${badgeClass}">
+                                ${item.status_validasi}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-slate-600 font-medium">Lakukan pengujian bukti dokumen & koordinasi daerah</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            const endIdx = Math.min(startIndex + validationRowsPerPage, totalRows);
+            document.getElementById('tabel-validation-pagination-info').textContent = 
+                `Menampilkan ${totalRows > 0 ? startIndex + 1 : 0}-${endIdx} dari ${totalRows} Lokus`;
+
+            document.getElementById('btn-prev-val-page').disabled = (currentValidationPage <= 1);
+            document.getElementById('btn-next-val-page').disabled = (currentValidationPage >= totalPages);
+        }
+
+        function changeValidationPage(direction) {
+            currentValidationPage += direction;
+            renderValidationTable();
+        }
+
+        function onValFilterChange() {
+            filterValProv = document.getElementById('filter-val-provinsi').value;
+            filterValStatusKhusus = document.getElementById('filter-val-status-khusus').value;
+            currentValidationPage = 1;
+            renderValidationTable();
+        }
+
+        function onSearchTabelValidation() {
+            searchValidationText = document.getElementById('search-tabel-validation').value.toLowerCase().trim();
+            currentValidationPage = 1;
+            renderValidationTable();
+        }
+
+        function exportValidationToExcel() {
+            const worksheet = XLSX.utils.json_to_sheet(validationList);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Daftar Validasi");
+            XLSX.writeFile(workbook, `Daftar_Antrean_Validasi_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function openAdminGateModal() {
+            const modal = document.getElementById('admin-gate-modal');
+            const box = document.getElementById('admin-modal-box');
+            document.getElementById('admin-error-panel').classList.add('hidden');
+            document.getElementById('admin-pin-field').value = '';
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                box.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeAdminGateModal() {
+            const modal = document.getElementById('admin-gate-modal');
+            const box = document.getElementById('admin-modal-box');
+            modal.classList.add('opacity-0');
+            box.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function submitAdminPIN() {
+            const pinInput = document.getElementById('admin-pin-field').value.trim();
+            const errPanel = document.getElementById('admin-error-panel');
+
+            // Default Admin Security PIN validation ('1234' or 'admin123')
+            if (pinInput === "1234" || pinInput === "admin123" || pinInput === "admin") {
+                closeAdminGateModal();
+                document.getElementById('view-dashboard').classList.add('hidden');
+                document.getElementById('view-admin').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                errPanel.classList.remove('hidden');
+            }
+        }
+
+        function exitAdminWorkspace() {
+            document.getElementById('view-admin').classList.add('hidden');
+            document.getElementById('view-dashboard').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
