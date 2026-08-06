@@ -74,7 +74,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <button type="button" onclick="exitAdminWorkspace(); this.blur();" class="flex items-center gap-3 text-left hover:opacity-90 transition-opacity focus:outline-none rounded-xl">
                 <div class="p-1.5 bg-white/10 backdrop-blur rounded-xl flex items-center justify-center border border-white/20 shadow-inner">
-                    <img src="Logo.png" alt="Logo Rumah DataKu" class="w-8 h-8 object-contain" onerror="this.src='https://placehold.co/32x32/0284c7/ffffff?text=RDK'">
+                    <img src="http://anwar.full.diskon.cloud/Logo1.png" alt="Logo Rumah DataKu" class="w-8 h-8 object-contain" onerror="this.src='https://placehold.co/32x32/0284c7/ffffff?text=RDK'">
                 </div>
                 <div>
                     <h1 class="font-extrabold text-white tracking-tight text-base sm:text-lg flex items-center gap-2">
@@ -113,7 +113,7 @@
                 </div>
                 <!-- Filters Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full lg:w-auto min-w-[280px] lg:min-w-[800px]">
-                    <!-- Filter Status Validasi (Modified: Removed 'Belum Tervalidasi' & 'Perlu Validasi Ulang') -->
+                    <!-- Filter Status Validasi -->
                     <div class="relative">
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Status Validasi</label>
                         <select id="filter-status-validasi" onchange="onFilterChange()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all font-medium">
@@ -151,7 +151,7 @@
 
         <!-- KPI SUMMARY SECTION -->
         <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Card 1: Total Lokus -->
+            <!-- Card 1: Total Lokus Unik -->
             <div class="glass-card rounded-2xl p-6 shadow-sm flex items-center gap-5 relative overflow-hidden group">
                 <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-sky-500/20 group-hover:scale-105 transition-transform duration-300">
                     <i class="fa-solid fa-house-chimney-window text-2xl"></i>
@@ -160,11 +160,11 @@
                     <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Lokus Terbentuk</p>
                     <div class="flex items-baseline gap-2">
                         <span id="kpi-total-lokus" class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">0</span>
-                        <span class="text-xs font-semibold text-slate-500">Lokus</span>
+                        <span class="text-xs font-semibold text-slate-500">Lokus Unik</span>
                     </div>
                     <p class="text-xs text-slate-500 flex items-center gap-1.5">
                         <i class="fa-solid fa-fingerprint text-sky-500"></i>
-                        Berdasarkan Banyaknya Lokus Terdata
+                        Berdasarkan ID Unik Lokus Terdata
                     </p>
                 </div>
             </div>
@@ -300,7 +300,7 @@
             </div>
         </section>
 
-        <!-- REKAP TABLE SECTION (Updated columns: No > Provinsi > Total Lokus > Target > Sesuai > Butuh Perbaikan > Bukti Dukung Belum lengkap) -->
+        <!-- REKAP TABLE SECTION (Complete 38 Provinces) -->
         <section class="grid grid-cols-1 gap-6">
             <div class="glass-card rounded-2xl p-6 shadow-sm flex flex-col border-t-4 border-t-sky-600">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -310,8 +310,11 @@
                                 <i class="fa-solid fa-table-list text-sm"></i>
                             </span>
                             <h3 class="text-base font-bold text-slate-900">Rekap Status Lokus Rumah DataKu</h3>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                                Aggregasi (Independen Filter Utama)
+                            </span>
                         </div>
-                        <p class="text-xs text-slate-500">Jumlah akumulasi Lokus berdasarkan Target & Status Validasi per provinsi (Daftar Lengkap 38 Provinsi)</p>
+                        <p class="text-xs text-slate-500">Jumlah akumulasi Lokus berdasarkan Target & Status Validasi per provinsi (Hanya terpengaruh oleh Filter Tahun)</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2">
                         <div class="relative w-full sm:w-60">
@@ -347,20 +350,25 @@
             </div>
         </section>
 
-        <!-- TABLE SECTION: DETAIL DATA RUMAH DATAKU WITH STATUS VALIDASI -->
+        <!-- TABLE SECTION: DETAIL DATA RUMAH DATAKU WITH UNIQUE ID ONLY -->
         <section class="grid grid-cols-1 gap-6">
             <div class="glass-card rounded-2xl p-6 shadow-sm flex flex-col">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div class="space-y-1">
-                        <h3 class="text-base font-bold text-slate-900">Daftar Lokus Rumah DataKu</h3>
-                        <p class="text-xs text-slate-500">Detail komprehensif data spasial, kegiatan, dan status validasi lokasi</p>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-base font-bold text-slate-900">Daftar Lokus Rumah DataKu</h3>
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100 text-sky-800 border border-sky-200">
+                                ID Unik
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500">Detail data spasial dan status validasi lokasi (Khusus ID Unik untuk mencegah duplikasi)</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2">
                         <div class="relative w-full sm:w-60">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                                 <i class="fa-solid fa-magnifying-glass text-xs"></i>
                             </span>
-                            <input type="text" id="search-tabel-utama" oninput="onSearchTabelUtama()" placeholder="Cari Kecamatan / Desa..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
+                            <input type="text" id="search-tabel-utama" oninput="onSearchTabelUtama()" placeholder="Cari ID / Desa / Kecamatan..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
                         </div>
                         <button onclick="exportToExcel()" class="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-emerald-500/10">
                             <i class="fa-solid fa-file-excel text-sm"></i>
@@ -374,6 +382,7 @@
                         <thead>
                             <tr class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200 uppercase tracking-wider">
                                 <th class="py-3.5 px-4 text-center w-12">No</th>
+                                <th class="py-3.5 px-4">Lokus ID</th>
                                 <th class="py-3.5 px-4">Status Validasi</th>
                                 <th class="py-3.5 px-4">Tahun</th>
                                 <th class="py-3.5 px-4">Provinsi</th>
@@ -735,7 +744,7 @@
             </div>
         </section>
 
-        <!-- NEW ADMIN TABLE SECTION: REKAP STATUS VALIDASI KHUSUS (PERLU VALIDASI ULANG & BELUM TERVALIDASI) -->
+        <!-- ADMIN REKAP TABLE SECTION -->
         <section class="grid grid-cols-1 gap-6">
             <div class="glass-card rounded-2xl p-6 shadow-sm border-l-4 border-l-purple-600 flex flex-col">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -831,7 +840,7 @@
         let incompleteList = [];
         let validationList = [];
         
-        // Pagination States: Dashboard Main Table
+        // Pagination States: Dashboard Main Unique Table
         let currentTablePage = 1;
         const rowsPerPage = 10;
         let searchFilterText = '';
@@ -1133,6 +1142,8 @@
             updateKpis(filterTahun, filterProv, filterKab);
             renderCharts();
             renderKabkotaList();
+            
+            // Rekap table is independent of main filters except filterTahun
             renderRekapTable();
             renderAdminRekapTable();
             
@@ -1509,13 +1520,13 @@
             });
         }
 
+        // RENDER REKAP TABLE: Detached from main filters (Status Validasi, Provinsi, Kab/Kota) -> ONLY Filter Tahun active!
         function renderRekapTable() {
             const tbody = document.getElementById('tabel-rekap-body');
             const tfoot = document.getElementById('tabel-rekap-foot');
             if (!tbody) return;
 
             const filterTahun = document.getElementById('filter-tahun') ? document.getElementById('filter-tahun').value : 'all';
-            const filterProv = document.getElementById('filter-provinsi') ? document.getElementById('filter-provinsi').value : 'all';
 
             let targetPerKab = 4;
             if (filterTahun === "2025") {
@@ -1524,8 +1535,13 @@
                 targetPerKab = 3;
             }
 
+            // Independent Database Filter: ONLY filtered by Tahun
+            const rekapDatabase = rawDatabase.filter(item => {
+                return (filterTahun === 'all') || (item.tahun === filterTahun);
+            });
+
             const uniqueLokusMap = new Map();
-            filteredDatabase.forEach(item => {
+            rekapDatabase.forEach(item => {
                 if (!uniqueLokusMap.has(item.id)) {
                     uniqueLokusMap.set(item.id, item);
                 }
@@ -1578,10 +1594,7 @@
 
             let rekapList = Object.values(rekapMap).sort((a, b) => a.provinsi.localeCompare(b.provinsi));
 
-            if (filterProv !== 'all') {
-                rekapList = rekapList.filter(r => r.provKey === filterProv);
-            }
-
+            // Apply internal search filter if typed in search-tabel-rekap
             if (searchRekapText) {
                 rekapList = rekapList.filter(r => r.provinsi.toLowerCase().includes(searchRekapText));
             }
@@ -1652,8 +1665,12 @@
             if (filterTahun === "2025") targetPerKab = 1;
             else if (filterTahun === "2026") targetPerKab = 3;
 
+            const rekapDatabase = rawDatabase.filter(item => {
+                return (filterTahun === 'all') || (item.tahun === filterTahun);
+            });
+
             const uniqueLokusMap = new Map();
-            filteredDatabase.forEach(item => {
+            rekapDatabase.forEach(item => {
                 if (!uniqueLokusMap.has(item.id)) {
                     uniqueLokusMap.set(item.id, item);
                 }
@@ -1698,215 +1715,94 @@
             XLSX.writeFile(workbook, `Rekap_Status_Lokus_RumahDataKu_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
 
-        function renderAdminRekapTable() {
-            const tbody = document.getElementById('tabel-admin-rekap-body');
-            const tfoot = document.getElementById('tabel-admin-rekap-foot');
-            if (!tbody) return;
-
-            const filterProv = document.getElementById('filter-provinsi') ? document.getElementById('filter-provinsi').value : 'all';
-
-            const uniqueLokusMap = new Map();
-            rawDatabase.forEach(item => {
-                if (!uniqueLokusMap.has(item.id)) {
-                    uniqueLokusMap.set(item.id, item);
+        // Utility Function to Deduplicate Main Table Records by UNIQUE ID
+        function getUniqueFilteredData() {
+            const uniqueMap = new Map();
+            filteredDatabase.forEach(item => {
+                if (!uniqueMap.has(item.id)) {
+                    uniqueMap.set(item.id, item);
                 }
             });
-
-            const adminRekapMap = {};
-            const allProvKeys = Object.keys(totalRegenciesByProvince);
-
-            allProvKeys.forEach(provKey => {
-                adminRekapMap[provKey] = {
-                    provinsi: toTitleCase(provKey),
-                    provKey: provKey,
-                    perluValidasiUlang: 0,
-                    belumTervalidasi: 0
-                };
-            });
-
-            uniqueLokusMap.forEach(item => {
-                const provKey = item.provinsi ? cleanName(item.provinsi) : '';
-                if (provKey && adminRekapMap[provKey]) {
-                    if (item.status_validasi === 'Perlu Validasi Ulang') adminRekapMap[provKey].perluValidasiUlang++;
-                    else if (item.status_validasi === 'Belum Tervalidasi') adminRekapMap[provKey].belumTervalidasi++;
-                } else if (provKey) {
-                    if (!adminRekapMap[provKey]) {
-                        adminRekapMap[provKey] = {
-                            provinsi: toTitleCase(provKey),
-                            provKey: provKey,
-                            perluValidasiUlang: 0,
-                            belumTervalidasi: 0
-                        };
-                    }
-                    if (item.status_validasi === 'Perlu Validasi Ulang') adminRekapMap[provKey].perluValidasiUlang++;
-                    else if (item.status_validasi === 'Belum Tervalidasi') adminRekapMap[provKey].belumTervalidasi++;
-                }
-            });
-
-            let adminRekapList = Object.values(adminRekapMap).sort((a, b) => a.provinsi.localeCompare(b.provinsi));
-
-            if (filterProv !== 'all') {
-                adminRekapList = adminRekapList.filter(r => r.provKey === filterProv);
-            }
-
-            if (searchAdminRekapText) {
-                adminRekapList = adminRekapList.filter(r => r.provinsi.toLowerCase().includes(searchAdminRekapText));
-            }
-
-            tbody.innerHTML = '';
-
-            if (adminRekapList.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="text-center py-8 text-slate-400 font-medium text-xs">
-                            <i class="fa-solid fa-folder-open text-xl mb-1.5 block"></i>
-                            Tidak ada data rekap khusus admin yang sesuai.
-                        </td>
-                    </tr>`;
-                if (tfoot) tfoot.innerHTML = '';
-                return;
-            }
-
-            let sumPerluVal = 0;
-            let sumBelumVal = 0;
-
-            adminRekapList.forEach((item, index) => {
-                sumPerluVal += item.perluValidasiUlang;
-                sumBelumVal += item.belumTervalidasi;
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-purple-50/40 transition-all text-xs";
-                tr.innerHTML = `
-                    <td class="py-3 px-4 text-center font-bold text-slate-400">${index + 1}</td>
-                    <td class="py-3 px-4 font-bold text-slate-800">${item.provinsi}</td>
-                    <td class="py-3 px-4 text-center font-semibold text-indigo-700 bg-indigo-50/20">${item.perluValidasiUlang.toLocaleString('id-ID')}</td>
-                    <td class="py-3 px-4 text-center font-semibold text-amber-700 bg-amber-50/20">${item.belumTervalidasi.toLocaleString('id-ID')}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            if (tfoot) {
-                tfoot.innerHTML = `
-                    <tr class="text-xs">
-                        <td colspan="2" class="py-3.5 px-4 text-slate-900 font-extrabold uppercase tracking-wider text-right">Total Akumulasi Admin</td>
-                        <td class="py-3.5 px-4 text-center font-extrabold text-indigo-700 bg-indigo-50/40">${sumPerluVal.toLocaleString('id-ID')}</td>
-                        <td class="py-3.5 px-4 text-center font-extrabold text-amber-700 bg-amber-50/40">${sumBelumVal.toLocaleString('id-ID')}</td>
-                    </tr>
-                `;
-            }
+            return Array.from(uniqueMap.values());
         }
 
-        function onSearchTabelAdminRekap() {
-            searchAdminRekapText = document.getElementById('search-tabel-admin-rekap').value.toLowerCase().trim();
-            renderAdminRekapTable();
-        }
-
-        function exportAdminRekapToExcel() {
-            const uniqueLokusMap = new Map();
-            rawDatabase.forEach(item => {
-                if (!uniqueLokusMap.has(item.id)) {
-                    uniqueLokusMap.set(item.id, item);
-                }
-            });
-
-            const adminRekapMap = {};
-            Object.keys(totalRegenciesByProvince).forEach(provKey => {
-                const provTitle = toTitleCase(provKey);
-                adminRekapMap[provKey] = {
-                    "No": 0,
-                    "Provinsi": provTitle,
-                    "Perlu Validasi Ulang": 0,
-                    "Belum Tervalidasi": 0
-                };
-            });
-
-            uniqueLokusMap.forEach(item => {
-                const provKey = item.provinsi ? cleanName(item.provinsi) : '';
-                if (provKey && adminRekapMap[provKey]) {
-                    if (item.status_validasi === 'Perlu Validasi Ulang') adminRekapMap[provKey]["Perlu Validasi Ulang"]++;
-                    else if (item.status_validasi === 'Belum Tervalidasi') adminRekapMap[provKey]["Belum Tervalidasi"]++;
-                }
-            });
-
-            const dataArray = Object.values(adminRekapMap)
-                .sort((a, b) => a.Provinsi.localeCompare(b.Provinsi))
-                .map((row, idx) => {
-                    row["No"] = idx + 1;
-                    return row;
-                });
-
-            const worksheet = XLSX.utils.json_to_sheet(dataArray);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Validasi Admin");
-            XLSX.writeFile(workbook, `Rekap_Validasi_Khusus_Admin_${new Date().toISOString().slice(0,10)}.xlsx`);
-        }
-
+        // Render Main Table: Displaying Unique IDs Only
         function renderMainTable() {
             const tbody = document.getElementById('tabel-lokus-body');
-            tbody.innerHTML = '';
+            if (!tbody) return;
 
-            let dataToDisplay = filteredDatabase;
-            if (searchFilterText) {
-                dataToDisplay = dataToDisplay.filter(item => 
-                    item.kecamatan.toLowerCase().includes(searchFilterText) ||
-                    item.desa.toLowerCase().includes(searchFilterText) ||
-                    item.kabkota.toLowerCase().includes(searchFilterText) ||
-                    item.provinsi.toLowerCase().includes(searchFilterText) ||
-                    item.id.toLowerCase().includes(searchFilterText)
-                );
-            }
+            const uniqueData = getUniqueFilteredData();
 
-            const totalRows = dataToDisplay.length;
+            let displayData = uniqueData.filter(item => {
+                if (!searchFilterText) return true;
+                return item.id.toLowerCase().includes(searchFilterText) ||
+                       item.provinsi.toLowerCase().includes(searchFilterText) ||
+                       item.kabkota.toLowerCase().includes(searchFilterText) ||
+                       item.kecamatan.toLowerCase().includes(searchFilterText) ||
+                       item.desa.toLowerCase().includes(searchFilterText) ||
+                       item.status_validasi.toLowerCase().includes(searchFilterText);
+            });
+
+            const totalRows = displayData.length;
             const totalPages = Math.ceil(totalRows / rowsPerPage) || 1;
-            
             if (currentTablePage > totalPages) currentTablePage = totalPages;
             if (currentTablePage < 1) currentTablePage = 1;
 
-            const startIndex = (currentTablePage - 1) * rowsPerPage;
-            const pageData = dataToDisplay.slice(startIndex, startIndex + rowsPerPage);
+            const startIdx = (currentTablePage - 1) * rowsPerPage;
+            const endIdx = Math.min(startIdx + rowsPerPage, totalRows);
+            const pageRows = displayData.slice(startIdx, endIdx);
 
-            if (pageData.length === 0) {
+            tbody.innerHTML = '';
+            if (pageRows.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="7" class="text-center py-8 text-slate-400 font-medium">
-                            <i class="fa-solid fa-folder-open text-2xl mb-2 block"></i>
-                            Tidak ada data lokus yang ditemukan.
+                        <td colspan="8" class="text-center py-8 text-slate-400 font-medium text-xs">
+                            <i class="fa-solid fa-folder-open text-xl mb-1.5 block"></i>
+                            Tidak ada data lokus unik yang ditemukan.
                         </td>
                     </tr>`;
             } else {
-                pageData.forEach((item, index) => {
-                    const globalIdx = startIndex + index + 1;
-                    let badgeClass = "bg-slate-100 text-slate-700 border-slate-200";
-                    if (item.status_validasi === "Sesuai") badgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
-                    else if (item.status_validasi === "Butuh Perbaikan") badgeClass = "bg-rose-50 text-rose-700 border-rose-200";
-                    else if (item.status_validasi === "Perlu Validasi Ulang") badgeClass = "bg-indigo-50 text-indigo-700 border-indigo-200";
-                    else if (item.status_validasi === "Belum Tervalidasi") badgeClass = "bg-amber-50 text-amber-700 border-amber-200";
+                pageRows.forEach((item, idx) => {
+                    const rowNo = startIdx + idx + 1;
+                    let statusBadgeClass = "bg-amber-50 text-amber-700 border-amber-200";
+                    if (item.status_validasi === "Sesuai") {
+                        statusBadgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                    } else if (item.status_validasi === "Butuh Perbaikan") {
+                        statusBadgeClass = "bg-rose-50 text-rose-700 border-rose-200";
+                    } else if (item.status_validasi === "Perlu Validasi Ulang") {
+                        statusBadgeClass = "bg-indigo-50 text-indigo-700 border-indigo-200";
+                    }
 
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50/80 transition-all";
+                    tr.className = "hover:bg-slate-50 transition-colors text-xs";
                     tr.innerHTML = `
-                        <td class="py-3.5 px-4 text-center font-bold text-slate-400">${globalIdx}</td>
-                        <td class="py-3.5 px-4">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold border ${badgeClass}">
+                        <td class="py-3 px-4 text-center font-bold text-slate-400">${rowNo}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-sky-700">${item.id}</td>
+                        <td class="py-3 px-4">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold border ${statusBadgeClass}">
                                 ${item.status_validasi}
                             </span>
                         </td>
-                        <td class="py-3.5 px-4 font-bold text-slate-600">${item.tahun}</td>
-                        <td class="py-3.5 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
-                        <td class="py-3.5 px-4 font-medium text-slate-700">${toTitleCase(item.kabkota)}</td>
-                        <td class="py-3.5 px-4 text-slate-600">${item.kecamatan || '-'}</td>
-                        <td class="py-3.5 px-4 text-slate-600 font-medium">${item.desa || '-'}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-600">${item.tahun}</td>
+                        <td class="py-3 px-4 font-bold text-slate-800">${item.provinsi}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-700">${item.kabkota}</td>
+                        <td class="py-3 px-4 text-slate-600">${item.kecamatan}</td>
+                        <td class="py-3 px-4 font-medium text-slate-800">${item.desa}</td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
-            const endIdx = Math.min(startIndex + rowsPerPage, totalRows);
-            document.getElementById('tabel-pagination-info').textContent = 
-                `Menampilkan ${totalRows > 0 ? startIndex + 1 : 0}-${endIdx} dari ${totalRows} baris`;
+            const pageInfo = document.getElementById('tabel-pagination-info');
+            if (pageInfo) {
+                const fromRow = totalRows > 0 ? startIdx + 1 : 0;
+                pageInfo.textContent = `Menampilkan ${fromRow}-${endIdx} dari ${totalRows} ID Lokus Unik`;
+            }
 
-            document.getElementById('btn-prev-page').disabled = (currentTablePage <= 1);
-            document.getElementById('btn-next-page').disabled = (currentTablePage >= totalPages);
+            const prevBtn = document.getElementById('btn-prev-page');
+            const nextBtn = document.getElementById('btn-next-page');
+            if (prevBtn) prevBtn.disabled = (currentTablePage <= 1);
+            if (nextBtn) nextBtn.disabled = (currentTablePage >= totalPages || totalPages === 0);
         }
 
         function changePage(direction) {
@@ -1921,524 +1817,552 @@
         }
 
         function exportToExcel() {
-            const worksheet = XLSX.utils.json_to_sheet(filteredDatabase);
+            const uniqueData = getUniqueFilteredData();
+            const exportData = uniqueData.map((item, idx) => ({
+                "No": idx + 1,
+                "Lokus ID": item.id,
+                "Status Validasi": item.status_validasi,
+                "Tahun": item.tahun,
+                "Provinsi": item.provinsi,
+                "Kab / Kota": item.kabkota,
+                "Kecamatan": item.kecamatan,
+                "Desa / Kelurahan": item.desa
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Daftar Lokus");
-            XLSX.writeFile(workbook, `Detail_Lokus_RumahDataKu_${new Date().toISOString().slice(0,10)}.xlsx`);
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Lokus Unik RumahDataKu");
+            XLSX.writeFile(workbook, `Daftar_Lokus_Unik_RumahDataKu_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
+
+        // ================= ADMIN & AUDIT LOGIC =================
 
         function performDuplicateAudit() {
-            const groupMap = {};
+            const desaMap = {};
             rawDatabase.forEach(item => {
-                const key = `${item.provinsi}|${item.kabkota}|${item.kecamatan}|${item.desa}`;
-                if (!groupMap[key]) groupMap[key] = [];
-                groupMap[key].push(item);
-            });
-
-            duplicateList = [];
-            Object.keys(groupMap).forEach(key => {
-                const items = groupMap[key];
-                if (items.length > 1) {
-                    const uniqueIds = [...new Set(items.map(x => x.id))];
-                    const first = items[0];
-                    duplicateList.push({
-                        provinsi: first.provinsi,
-                        kabkota: first.kabkota,
-                        kecamatan: first.kecamatan,
-                        desa: first.desa,
-                        ids: uniqueIds.join(", "),
-                        totalEntries: items.length,
-                        issue: uniqueIds.length > 1 ? "ID Spasial Berbeda" : "Entri Baris Ganda"
-                    });
+                const locationKey = `${item.provinsi}|${item.kabkota}|${item.kecamatan}|${item.desa}`;
+                if (!desaMap[locationKey]) {
+                    desaMap[locationKey] = {
+                        provinsi: item.provinsi,
+                        kabkota: item.kabkota,
+                        kecamatan: item.kecamatan,
+                        desa: item.desa,
+                        ids: new Set(),
+                        entriesCount: 0
+                    };
                 }
+                desaMap[locationKey].ids.add(item.id);
+                desaMap[locationKey].entriesCount++;
             });
 
-            renderDuplicatesTable();
+            duplicateList = Object.values(desaMap).filter(loc => loc.ids.size > 1 || loc.entriesCount > 1);
+            renderDuplicateTable();
         }
 
-        function renderDuplicatesTable() {
+        function renderDuplicateTable() {
             const tbody = document.getElementById('tabel-duplikat-body');
-            tbody.innerHTML = '';
+            if (!tbody) return;
 
-            let dataToDisplay = duplicateList;
-            if (searchDupText) {
-                dataToDisplay = dataToDisplay.filter(item =>
-                    item.provinsi.toLowerCase().includes(searchDupText) ||
-                    item.kabkota.toLowerCase().includes(searchDupText) ||
-                    item.desa.toLowerCase().includes(searchDupText) ||
-                    item.ids.toLowerCase().includes(searchDupText)
-                );
-            }
+            let displayData = duplicateList.filter(item => {
+                if (!searchDupText) return true;
+                return item.provinsi.toLowerCase().includes(searchDupText) ||
+                       item.kabkota.toLowerCase().includes(searchDupText) ||
+                       item.kecamatan.toLowerCase().includes(searchDupText) ||
+                       item.desa.toLowerCase().includes(searchDupText);
+            });
 
-            const totalRows = dataToDisplay.length;
+            const totalRows = displayData.length;
             const totalPages = Math.ceil(totalRows / dupRowsPerPage) || 1;
-            
             if (currentDupPage > totalPages) currentDupPage = totalPages;
             if (currentDupPage < 1) currentDupPage = 1;
 
-            const startIndex = (currentDupPage - 1) * dupRowsPerPage;
-            const pageData = dataToDisplay.slice(startIndex, startIndex + dupRowsPerPage);
+            const startIdx = (currentDupPage - 1) * dupRowsPerPage;
+            const pageRows = displayData.slice(startIdx, startIdx + dupRowsPerPage);
 
-            if (pageData.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="text-center py-6 text-amber-700/60 font-medium">
-                            <i class="fa-solid fa-circle-check text-xl mb-1 block text-amber-500"></i>
-                            Tidak ditemukan konflik data duplikat!
-                        </td>
-                    </tr>`;
+            tbody.innerHTML = '';
+            if (pageRows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400">Tidak ada temuan data duplikat.</td></tr>`;
             } else {
-                pageData.forEach((item, index) => {
-                    const globalIdx = startIndex + index + 1;
+                pageRows.forEach((item, idx) => {
+                    const idsArr = Array.from(item.ids).join(', ');
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-amber-50/30 transition-all";
+                    tr.className = "hover:bg-amber-50/30 text-xs";
                     tr.innerHTML = `
-                        <td class="py-3 px-4 text-center font-bold text-amber-600/70">${globalIdx}</td>
-                        <td class="py-3 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
-                        <td class="py-3 px-4 font-medium text-slate-700">${toTitleCase(item.kabkota)}</td>
-                        <td class="py-3 px-4 text-slate-600">${item.kecamatan}</td>
-                        <td class="py-3 px-4 text-slate-800 font-bold">${item.desa}</td>
-                        <td class="py-3 px-4 text-center font-mono font-bold text-amber-800 bg-amber-100/40 rounded-lg">${item.ids}</td>
-                        <td class="py-3 px-4 text-center font-extrabold text-amber-700">${item.totalEntries}</td>
-                        <td class="py-3 px-4">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                                ${item.issue}
-                            </span>
-                        </td>
+                        <td class="py-3 px-4 text-center font-bold text-slate-400">${startIdx + idx + 1}</td>
+                        <td class="py-3 px-4 font-bold text-slate-800">${item.provinsi}</td>
+                        <td class="py-3 px-4">${item.kabkota}</td>
+                        <td class="py-3 px-4">${item.kecamatan}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-800">${item.desa}</td>
+                        <td class="py-3 px-4 text-center font-mono font-bold text-amber-700">${idsArr}</td>
+                        <td class="py-3 px-4 text-center font-extrabold text-slate-800">${item.entriesCount} Baris</td>
+                        <td class="py-3 px-4 text-rose-600 font-medium">Konflik Pendaftaran Wilayah Ganda</td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
-            const endIdx = Math.min(startIndex + dupRowsPerPage, totalRows);
-            document.getElementById('tabel-duplikat-pagination-info').textContent = 
-                `Menampilkan ${totalRows > 0 ? startIndex + 1 : 0}-${endIdx} dari ${totalRows} baris duplikat`;
+            const pageInfo = document.getElementById('tabel-duplikat-pagination-info');
+            if (pageInfo) pageInfo.textContent = `Menampilkan ${totalRows > 0 ? startIdx + 1 : 0}-${Math.min(startIdx + dupRowsPerPage, totalRows)} dari ${totalRows} Wilayah Terlibat Duplikat`;
 
             document.getElementById('btn-prev-dup-page').disabled = (currentDupPage <= 1);
-            document.getElementById('btn-next-dup-page').disabled = (currentDupPage >= totalPages);
+            document.getElementById('btn-next-dup-page').disabled = (currentDupPage >= totalPages || totalPages === 0);
         }
 
-        function changeDupPage(direction) {
-            currentDupPage += direction;
-            renderDuplicatesTable();
-        }
-
-        function onSearchTabelDuplikat() {
-            searchDupText = document.getElementById('search-tabel-duplikat').value.toLowerCase().trim();
-            currentDupPage = 1;
-            renderDuplicatesTable();
-        }
-
-        function exportDuplicatesToExcel() {
-            const worksheet = XLSX.utils.json_to_sheet(duplicateList);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Audit Duplikat");
-            XLSX.writeFile(workbook, `Audit_Duplikat_Lokus_${new Date().toISOString().slice(0,10)}.xlsx`);
-        }
+        function changeDupPage(dir) { currentDupPage += dir; renderDuplicateTable(); }
+        function onSearchTabelDuplikat() { searchDupText = document.getElementById('search-tabel-duplikat').value.toLowerCase().trim(); currentDupPage = 1; renderDuplicateTable(); }
 
         function performAnomaliesAudits() {
             pemanfAnomalyList = [];
             updateAnomalyList = [];
             incompleteList = [];
 
+            const validPemanf = ['ya', 'tidak'];
+            const validUpdate = ['1 kali', '2 kali', '> 2 kali'];
+
             rawDatabase.forEach(item => {
-                const pAct = item.pemanf_aktif;
-                if (pAct && !['ya', 'tidak'].includes(pAct.toLowerCase())) {
-                    pemanfAnomalyList.push({
-                        id: item.id,
-                        tahun: item.tahun,
-                        provinsi: item.provinsi,
-                        kabkota: item.kabkota,
-                        desa: item.desa,
-                        val: pAct,
-                        recom: "Koreksi nilai menjadi 'Ya' atau 'Tidak'"
-                    });
+                const pemanfVal = item.pemanf_aktif ? item.pemanf_aktif.toLowerCase().trim() : '';
+                const updateVal = item.pembaruan ? item.pembaruan.toLowerCase().trim() : '';
+
+                if (pemanfVal !== '' && !validPemanf.includes(pemanfVal)) {
+                    pemanfAnomalyList.push({ ...item, issue: `Format "${item.pemanf_aktif}" tidak standar` });
                 }
 
-                const upd = item.pembaruan;
-                if (upd && !['1 kali', '2 kali', '> 2 kali'].includes(upd.toLowerCase())) {
-                    updateAnomalyList.push({
-                        id: item.id,
-                        tahun: item.tahun,
-                        provinsi: item.provinsi,
-                        kabkota: item.kabkota,
-                        desa: item.desa,
-                        val: upd,
-                        recom: "Sesuaikan dengan format pilihan standar"
-                    });
+                if (updateVal !== '' && !validUpdate.includes(updateVal)) {
+                    updateAnomalyList.push({ ...item, issue: `Format "${item.pembaruan}" tidak sesuai opsi baku` });
                 }
 
-                const emptyFields = [];
-                if (!item.pembaruan || item.pembaruan === '') emptyFields.push("Pemutakhiran Data");
-                if (!item.pemanf_aktif || item.pemanf_aktif === '') emptyFields.push("Pemanfaatan Data");
-
-                if (emptyFields.length > 0) {
-                    incompleteList.push({
-                        id: item.id,
-                        tahun: item.tahun,
-                        provinsi: item.provinsi,
-                        kabkota: item.kabkota,
-                        desa: item.desa,
-                        missing: emptyFields.join(", "),
-                        recom: "Lengkapi data indikator yang kosong"
-                    });
+                if (pemanfVal === '' || updateVal === '') {
+                    const missing = [];
+                    if (pemanfVal === '') missing.push('Status Pemanfaatan');
+                    if (updateVal === '') missing.push('Pemutakhiran Data');
+                    incompleteList.push({ ...item, missingFields: missing.join(', ') });
                 }
             });
 
-            renderPemanfAnomaliesTable();
-            renderUpdateAnomaliesTable();
+            renderPemanfAnomalyTable();
+            renderUpdateAnomalyTable();
             renderIncompleteTable();
         }
 
-        function renderPemanfAnomaliesTable() {
+        function renderPemanfAnomalyTable() {
             const tbody = document.getElementById('tabel-pemanf-body');
-            tbody.innerHTML = '';
+            if (!tbody) return;
 
-            let dataToDisplay = pemanfAnomalyList;
-            if (searchPemanfText) {
-                dataToDisplay = dataToDisplay.filter(item =>
-                    item.id.toLowerCase().includes(searchPemanfText) ||
-                    item.provinsi.toLowerCase().includes(searchPemanfText) ||
-                    item.desa.toLowerCase().includes(searchPemanfText)
-                );
-            }
+            let displayData = pemanfAnomalyList.filter(item => {
+                if (!searchPemanfText) return true;
+                return item.id.toLowerCase().includes(searchPemanfText) || item.provinsi.toLowerCase().includes(searchPemanfText) || item.desa.toLowerCase().includes(searchPemanfText);
+            });
 
-            const totalRows = dataToDisplay.length;
+            const totalRows = displayData.length;
             const totalPages = Math.ceil(totalRows / pemanfRowsPerPage) || 1;
-            
             if (currentPemanfPage > totalPages) currentPemanfPage = totalPages;
             if (currentPemanfPage < 1) currentPemanfPage = 1;
 
-            const startIndex = (currentPemanfPage - 1) * pemanfRowsPerPage;
-            const pageData = dataToDisplay.slice(startIndex, startIndex + pemanfRowsPerPage);
+            const startIdx = (currentPemanfPage - 1) * pemanfRowsPerPage;
+            const pageRows = displayData.slice(startIdx, startIdx + pemanfRowsPerPage);
 
-            if (pageData.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="text-center py-6 text-rose-700/60 font-medium">
-                            <i class="fa-solid fa-circle-check text-xl mb-1 block text-emerald-500"></i>
-                            Tidak ada anomali isian pemanfaatan data.
-                        </td>
-                    </tr>`;
+            tbody.innerHTML = '';
+            if (pageRows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400">Tidak ada anomali pada kolom pemanfaatan.</td></tr>`;
             } else {
-                pageData.forEach((item, index) => {
-                    const globalIdx = startIndex + index + 1;
+                pageRows.forEach((item, idx) => {
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-rose-50/30 transition-all";
+                    tr.className = "hover:bg-rose-50/30 text-xs";
                     tr.innerHTML = `
-                        <td class="py-3 px-4 text-center font-bold text-rose-600/70">${globalIdx}</td>
-                        <td class="py-3 px-4 font-mono font-bold text-slate-800">${item.id}</td>
-                        <td class="py-3 px-4 font-bold text-slate-600">${item.tahun}</td>
-                        <td class="py-3 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
-                        <td class="py-3 px-4 font-medium text-slate-700">${toTitleCase(item.kabkota)}</td>
-                        <td class="py-3 px-4 text-slate-800 font-bold">${item.desa}</td>
-                        <td class="py-3 px-4 text-center font-bold text-rose-700 bg-rose-100/50 rounded-lg">${item.val}</td>
-                        <td class="py-3 px-4 text-slate-600 font-medium">${item.recom}</td>
+                        <td class="py-3 px-4 text-center font-bold text-slate-400">${startIdx + idx + 1}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-sky-700">${item.id}</td>
+                        <td class="py-3 px-4">${item.tahun}</td>
+                        <td class="py-3 px-4 font-bold text-slate-800">${item.provinsi}</td>
+                        <td class="py-3 px-4">${item.kabkota}</td>
+                        <td class="py-3 px-4 font-medium text-slate-800">${item.desa}</td>
+                        <td class="py-3 px-4 text-center font-bold text-rose-700">${item.pemanf_aktif || '(Kosong)'}</td>
+                        <td class="py-3 px-4 text-slate-600">Standardisasi ke "Ya" atau "Tidak"</td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
-            const endIdx = Math.min(startIndex + pemanfRowsPerPage, totalRows);
-            document.getElementById('tabel-pemanf-pagination-info').textContent = 
-                `Menampilkan ${totalRows > 0 ? startIndex + 1 : 0}-${endIdx} dari ${totalRows} baris anomali`;
+            const pageInfo = document.getElementById('tabel-pemanf-pagination-info');
+            if (pageInfo) pageInfo.textContent = `Menampilkan ${totalRows > 0 ? startIdx + 1 : 0}-${Math.min(startIdx + pemanfRowsPerPage, totalRows)} dari ${totalRows} Anomali Pemanfaatan`;
 
             document.getElementById('btn-prev-pemanf-page').disabled = (currentPemanfPage <= 1);
-            document.getElementById('btn-next-pemanf-page').disabled = (currentPemanfPage >= totalPages);
+            document.getElementById('btn-next-pemanf-page').disabled = (currentPemanfPage >= totalPages || totalPages === 0);
         }
 
-        function changePemanfPage(direction) {
-            currentPemanfPage += direction;
-            renderPemanfAnomaliesTable();
-        }
+        function changePemanfPage(dir) { currentPemanfPage += dir; renderPemanfAnomalyTable(); }
+        function onSearchTabelPemanf() { searchPemanfText = document.getElementById('search-tabel-pemanf').value.toLowerCase().trim(); currentPemanfPage = 1; renderPemanfAnomalyTable(); }
 
-        function onSearchTabelPemanf() {
-            searchPemanfText = document.getElementById('search-tabel-pemanf').value.toLowerCase().trim();
-            currentPemanfPage = 1;
-            renderPemanfAnomaliesTable();
-        }
-
-        function exportPemanfAnomaliesToExcel() {
-            const worksheet = XLSX.utils.json_to_sheet(pemanfAnomalyList);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Anomali Pemanfaatan");
-            XLSX.writeFile(workbook, `Anomali_Pemanfaatan_${new Date().toISOString().slice(0,10)}.xlsx`);
-        }
-
-        function renderUpdateAnomaliesTable() {
+        function renderUpdateAnomalyTable() {
             const tbody = document.getElementById('tabel-update-body');
-            tbody.innerHTML = '';
+            if (!tbody) return;
 
-            let dataToDisplay = updateAnomalyList;
-            if (searchUpdateText) {
-                dataToDisplay = dataToDisplay.filter(item =>
-                    item.id.toLowerCase().includes(searchUpdateText) ||
-                    item.provinsi.toLowerCase().includes(searchUpdateText) ||
-                    item.desa.toLowerCase().includes(searchUpdateText)
-                );
-            }
+            let displayData = updateAnomalyList.filter(item => {
+                if (!searchUpdateText) return true;
+                return item.id.toLowerCase().includes(searchUpdateText) || item.provinsi.toLowerCase().includes(searchUpdateText) || item.desa.toLowerCase().includes(searchUpdateText);
+            });
 
-            const totalRows = dataToDisplay.length;
+            const totalRows = displayData.length;
             const totalPages = Math.ceil(totalRows / updateRowsPerPage) || 1;
-            
             if (currentUpdatePage > totalPages) currentUpdatePage = totalPages;
             if (currentUpdatePage < 1) currentUpdatePage = 1;
 
-            const startIndex = (currentUpdatePage - 1) * updateRowsPerPage;
-            const pageData = dataToDisplay.slice(startIndex, startIndex + updateRowsPerPage);
+            const startIdx = (currentUpdatePage - 1) * updateRowsPerPage;
+            const pageRows = displayData.slice(startIdx, startIdx + updateRowsPerPage);
 
-            if (pageData.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="text-center py-6 text-violet-700/60 font-medium">
-                            <i class="fa-solid fa-circle-check text-xl mb-1 block text-emerald-500"></i>
-                            Tidak ada anomali isian pemutakhiran data.
-                        </td>
-                    </tr>`;
+            tbody.innerHTML = '';
+            if (pageRows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400">Tidak ada anomali pada kolom pemutakhiran.</td></tr>`;
             } else {
-                pageData.forEach((item, index) => {
-                    const globalIdx = startIndex + index + 1;
+                pageRows.forEach((item, idx) => {
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-violet-50/30 transition-all";
+                    tr.className = "hover:bg-violet-50/30 text-xs";
                     tr.innerHTML = `
-                        <td class="py-3 px-4 text-center font-bold text-violet-600/70">${globalIdx}</td>
-                        <td class="py-3 px-4 font-mono font-bold text-slate-800">${item.id}</td>
-                        <td class="py-3 px-4 font-bold text-slate-600">${item.tahun}</td>
-                        <td class="py-3 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
-                        <td class="py-3 px-4 font-medium text-slate-700">${toTitleCase(item.kabkota)}</td>
-                        <td class="py-3 px-4 text-slate-800 font-bold">${item.desa}</td>
-                        <td class="py-3 px-4 text-center font-bold text-violet-700 bg-violet-100/50 rounded-lg">${item.val}</td>
-                        <td class="py-3 px-4 text-slate-600 font-medium">${item.recom}</td>
+                        <td class="py-3 px-4 text-center font-bold text-slate-400">${startIdx + idx + 1}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-sky-700">${item.id}</td>
+                        <td class="py-3 px-4">${item.tahun}</td>
+                        <td class="py-3 px-4 font-bold text-slate-800">${item.provinsi}</td>
+                        <td class="py-3 px-4">${item.kabkota}</td>
+                        <td class="py-3 px-4 font-medium text-slate-800">${item.desa}</td>
+                        <td class="py-3 px-4 text-center font-bold text-violet-700">${item.pembaruan || '(Kosong)'}</td>
+                        <td class="py-3 px-4 text-slate-600">Standardisasi ke "1 Kali", "2 Kali", atau "> 2 Kali"</td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
-            const endIdx = Math.min(startIndex + updateRowsPerPage, totalRows);
-            document.getElementById('tabel-update-pagination-info').textContent = 
-                `Menampilkan ${totalRows > 0 ? startIndex + 1 : 0}-${endIdx} dari ${totalRows} baris anomali`;
+            const pageInfo = document.getElementById('tabel-update-pagination-info');
+            if (pageInfo) pageInfo.textContent = `Menampilkan ${totalRows > 0 ? startIdx + 1 : 0}-${Math.min(startIdx + updateRowsPerPage, totalRows)} dari ${totalRows} Anomali Pemutakhiran`;
 
             document.getElementById('btn-prev-update-page').disabled = (currentUpdatePage <= 1);
-            document.getElementById('btn-next-update-page').disabled = (currentUpdatePage >= totalPages);
+            document.getElementById('btn-next-update-page').disabled = (currentUpdatePage >= totalPages || totalPages === 0);
         }
 
-        function changeUpdatePage(direction) {
-            currentUpdatePage += direction;
-            renderUpdateAnomaliesTable();
-        }
-
-        function onSearchTabelUpdate() {
-            searchUpdateText = document.getElementById('search-tabel-update').value.toLowerCase().trim();
-            currentUpdatePage = 1;
-            renderUpdateAnomaliesTable();
-        }
-
-        function exportUpdateAnomaliesToExcel() {
-            const worksheet = XLSX.utils.json_to_sheet(updateAnomalyList);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Anomali Pemutakhiran");
-            XLSX.writeFile(workbook, `Anomali_Pemutakhiran_${new Date().toISOString().slice(0,10)}.xlsx`);
-        }
+        function changeUpdatePage(dir) { currentUpdatePage += dir; renderUpdateAnomalyTable(); }
+        function onSearchTabelUpdate() { searchUpdateText = document.getElementById('search-tabel-update').value.toLowerCase().trim(); currentUpdatePage = 1; renderUpdateAnomalyTable(); }
 
         function renderIncompleteTable() {
             const tbody = document.getElementById('tabel-incomplete-body');
-            tbody.innerHTML = '';
+            if (!tbody) return;
 
-            let dataToDisplay = incompleteList;
-            if (searchIncompleteText) {
-                dataToDisplay = dataToDisplay.filter(item =>
-                    item.id.toLowerCase().includes(searchIncompleteText) ||
-                    item.provinsi.toLowerCase().includes(searchIncompleteText) ||
-                    item.desa.toLowerCase().includes(searchIncompleteText)
-                );
-            }
+            let displayData = incompleteList.filter(item => {
+                if (!searchIncompleteText) return true;
+                return item.id.toLowerCase().includes(searchIncompleteText) || item.provinsi.toLowerCase().includes(searchIncompleteText) || item.desa.toLowerCase().includes(searchIncompleteText);
+            });
 
-            const totalRows = dataToDisplay.length;
+            const totalRows = displayData.length;
             const totalPages = Math.ceil(totalRows / incompleteRowsPerPage) || 1;
-            
             if (currentIncompletePage > totalPages) currentIncompletePage = totalPages;
             if (currentIncompletePage < 1) currentIncompletePage = 1;
 
-            const startIndex = (currentIncompletePage - 1) * incompleteRowsPerPage;
-            const pageData = dataToDisplay.slice(startIndex, startIndex + incompleteRowsPerPage);
+            const startIdx = (currentIncompletePage - 1) * incompleteRowsPerPage;
+            const pageRows = displayData.slice(startIdx, startIdx + incompleteRowsPerPage);
 
-            if (pageData.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="text-center py-6 text-sky-700/60 font-medium">
-                            <i class="fa-solid fa-circle-check text-xl mb-1 block text-emerald-500"></i>
-                            Semua baris data terisi lengkap!
-                        </td>
-                    </tr>`;
+            tbody.innerHTML = '';
+            if (pageRows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400">Tidak ada baris data dengan kolom belum lengkap.</td></tr>`;
             } else {
-                pageData.forEach((item, index) => {
-                    const globalIdx = startIndex + index + 1;
+                pageRows.forEach((item, idx) => {
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-sky-50/30 transition-all";
+                    tr.className = "hover:bg-sky-50/30 text-xs";
                     tr.innerHTML = `
-                        <td class="py-3 px-4 text-center font-bold text-sky-600/70">${globalIdx}</td>
-                        <td class="py-3 px-4 font-mono font-bold text-slate-800">${item.id}</td>
-                        <td class="py-3 px-4 font-bold text-slate-600">${item.tahun}</td>
-                        <td class="py-3 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
-                        <td class="py-3 px-4 font-medium text-slate-700">${toTitleCase(item.kabkota)}</td>
-                        <td class="py-3 px-4 text-slate-800 font-bold">${item.desa}</td>
-                        <td class="py-3 px-4 text-center font-bold text-sky-700 bg-sky-100/50 rounded-lg">${item.missing}</td>
-                        <td class="py-3 px-4 text-slate-600 font-medium">${item.recom}</td>
+                        <td class="py-3 px-4 text-center font-bold text-slate-400">${startIdx + idx + 1}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-sky-700">${item.id}</td>
+                        <td class="py-3 px-4">${item.tahun}</td>
+                        <td class="py-3 px-4 font-bold text-slate-800">${item.provinsi}</td>
+                        <td class="py-3 px-4">${item.kabkota}</td>
+                        <td class="py-3 px-4 font-medium text-slate-800">${item.desa}</td>
+                        <td class="py-3 px-4 text-center font-bold text-amber-600">${item.missingFields}</td>
+                        <td class="py-3 px-4 text-slate-600">Lengkapi data indikator pendukung</td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
-            const endIdx = Math.min(startIndex + incompleteRowsPerPage, totalRows);
-            document.getElementById('tabel-incomplete-pagination-info').textContent = 
-                `Menampilkan ${totalRows > 0 ? startIndex + 1 : 0}-${endIdx} dari ${totalRows} baris belum lengkap`;
+            const pageInfo = document.getElementById('tabel-incomplete-pagination-info');
+            if (pageInfo) pageInfo.textContent = `Menampilkan ${totalRows > 0 ? startIdx + 1 : 0}-${Math.min(startIdx + incompleteRowsPerPage, totalRows)} dari ${totalRows} Data Belum Lengkap`;
 
             document.getElementById('btn-prev-incomplete-page').disabled = (currentIncompletePage <= 1);
-            document.getElementById('btn-next-incomplete-page').disabled = (currentIncompletePage >= totalPages);
+            document.getElementById('btn-next-incomplete-page').disabled = (currentIncompletePage >= totalPages || totalPages === 0);
         }
 
-        function changeIncompletePage(direction) {
-            currentIncompletePage += direction;
-            renderIncompleteTable();
-        }
-
-        function onSearchTabelIncomplete() {
-            searchIncompleteText = document.getElementById('search-tabel-incomplete').value.toLowerCase().trim();
-            currentIncompletePage = 1;
-            renderIncompleteTable();
-        }
-
-        function exportIncompleteToExcel() {
-            const worksheet = XLSX.utils.json_to_sheet(incompleteList);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Data Belum Lengkap");
-            XLSX.writeFile(workbook, `Data_Belum_Lengkap_${new Date().toISOString().slice(0,10)}.xlsx`);
-        }
+        function changeIncompletePage(dir) { currentIncompletePage += dir; renderIncompleteTable(); }
+        function onSearchTabelIncomplete() { searchIncompleteText = document.getElementById('search-tabel-incomplete').value.toLowerCase().trim(); currentIncompletePage = 1; renderIncompleteTable(); }
 
         function performValidationAudit() {
-            validationList = rawDatabase.filter(item => 
-                item.status_validasi === "Belum Tervalidasi" || item.status_validasi === "Perlu Validasi Ulang"
-            );
+            validationList = rawDatabase.filter(item => {
+                return item.status_validasi === "Belum Tervalidasi" || item.status_validasi === "Perlu Validasi Ulang";
+            });
             renderValidationTable();
         }
 
         function renderValidationTable() {
             const tbody = document.getElementById('tabel-validation-body');
-            tbody.innerHTML = '';
+            if (!tbody) return;
 
-            let dataToDisplay = validationList;
-
-            if (filterValProv !== 'all') {
-                dataToDisplay = dataToDisplay.filter(item => item.provinsi === filterValProv);
-            }
-
-            if (filterValStatusKhusus !== 'all') {
-                dataToDisplay = dataToDisplay.filter(item => item.status_validasi === filterValStatusKhusus);
-            }
-
-            if (searchValidationText) {
-                dataToDisplay = dataToDisplay.filter(item =>
+            let displayData = validationList.filter(item => {
+                const matchProv = (filterValProv === 'all') || (item.provinsi === filterValProv);
+                const matchStatus = (filterValStatusKhusus === 'all') || (item.status_validasi === filterValStatusKhusus);
+                const matchSearch = !searchValidationText || (
                     item.id.toLowerCase().includes(searchValidationText) ||
                     item.provinsi.toLowerCase().includes(searchValidationText) ||
                     item.kabkota.toLowerCase().includes(searchValidationText) ||
                     item.desa.toLowerCase().includes(searchValidationText)
                 );
-            }
+                return matchProv && matchStatus && matchSearch;
+            });
 
-            const totalRows = dataToDisplay.length;
+            const totalRows = displayData.length;
             const totalPages = Math.ceil(totalRows / validationRowsPerPage) || 1;
-            
             if (currentValidationPage > totalPages) currentValidationPage = totalPages;
             if (currentValidationPage < 1) currentValidationPage = 1;
 
-            const startIndex = (currentValidationPage - 1) * validationRowsPerPage;
-            const pageData = dataToDisplay.slice(startIndex, startIndex + validationRowsPerPage);
+            const startIdx = (currentValidationPage - 1) * validationRowsPerPage;
+            const pageRows = displayData.slice(startIdx, startIdx + validationRowsPerPage);
 
-            if (pageData.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="text-center py-6 text-indigo-700/60 font-medium">
-                            <i class="fa-solid fa-circle-check text-xl mb-1 block text-emerald-500"></i>
-                            Tidak ada lokus dalam antrean validasi khusus.
-                        </td>
-                    </tr>`;
+            tbody.innerHTML = '';
+            if (pageRows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400">Tidak ada lokasi yang perlu divalidasi.</td></tr>`;
             } else {
-                pageData.forEach((item, index) => {
-                    const globalIdx = startIndex + index + 1;
-                    let badgeClass = item.status_validasi === "Perlu Validasi Ulang" ? 
-                        "bg-indigo-100 text-indigo-800 border-indigo-200" : "bg-amber-100 text-amber-800 border-amber-200";
-
+                pageRows.forEach((item, idx) => {
+                    const isReval = item.status_validasi === "Perlu Validasi Ulang";
+                    const badgeClass = isReval ? "bg-indigo-100 text-indigo-800 border-indigo-200" : "bg-amber-100 text-amber-800 border-amber-200";
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-indigo-50/30 transition-all";
+                    tr.className = "hover:bg-indigo-50/30 text-xs";
                     tr.innerHTML = `
-                        <td class="py-3 px-4 text-center font-bold text-indigo-600/70">${globalIdx}</td>
-                        <td class="py-3 px-4 font-mono font-bold text-slate-800">${item.id}</td>
-                        <td class="py-3 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
-                        <td class="py-3 px-4 font-medium text-slate-700">${toTitleCase(item.kabkota)}</td>
-                        <td class="py-3 px-4 text-slate-600">${item.kecamatan}</td>
-                        <td class="py-3 px-4 text-slate-800 font-bold">${item.desa}</td>
+                        <td class="py-3 px-4 text-center font-bold text-slate-400">${startIdx + idx + 1}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-sky-700">${item.id}</td>
+                        <td class="py-3 px-4 font-bold text-slate-800">${item.provinsi}</td>
+                        <td class="py-3 px-4">${item.kabkota}</td>
+                        <td class="py-3 px-4">${item.kecamatan}</td>
+                        <td class="py-3 px-4 font-medium text-slate-800">${item.desa}</td>
                         <td class="py-3 px-4">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded text-[10px] font-bold border ${badgeClass}">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold border ${badgeClass}">
                                 ${item.status_validasi}
                             </span>
                         </td>
-                        <td class="py-3 px-4 text-slate-600 font-medium">Lakukan pengujian bukti dokumen & koordinasi daerah</td>
+                        <td class="py-3 px-4 text-indigo-700 font-medium">${isReval ? 'Periksa perbaikan dokumen' : 'Verifikasi kelengkapan data awal'}</td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
-            const endIdx = Math.min(startIndex + validationRowsPerPage, totalRows);
-            document.getElementById('tabel-validation-pagination-info').textContent = 
-                `Menampilkan ${totalRows > 0 ? startIndex + 1 : 0}-${endIdx} dari ${totalRows} Lokus`;
+            const pageInfo = document.getElementById('tabel-validation-pagination-info');
+            if (pageInfo) pageInfo.textContent = `Menampilkan ${totalRows > 0 ? startIdx + 1 : 0}-${Math.min(startIdx + validationRowsPerPage, totalRows)} dari ${totalRows} Lokus Perlu Validasi`;
 
             document.getElementById('btn-prev-val-page').disabled = (currentValidationPage <= 1);
-            document.getElementById('btn-next-val-page').disabled = (currentValidationPage >= totalPages);
+            document.getElementById('btn-next-val-page').disabled = (currentValidationPage >= totalPages || totalPages === 0);
         }
 
-        function changeValidationPage(direction) {
-            currentValidationPage += direction;
-            renderValidationTable();
-        }
-
+        function changeValidationPage(dir) { currentValidationPage += dir; renderValidationTable(); }
         function onValFilterChange() {
             filterValProv = document.getElementById('filter-val-provinsi').value;
             filterValStatusKhusus = document.getElementById('filter-val-status-khusus').value;
             currentValidationPage = 1;
             renderValidationTable();
         }
+        function onSearchTabelValidation() { searchValidationText = document.getElementById('search-tabel-validation').value.toLowerCase().trim(); currentValidationPage = 1; renderValidationTable(); }
 
-        function onSearchTabelValidation() {
-            searchValidationText = document.getElementById('search-tabel-validation').value.toLowerCase().trim();
-            currentValidationPage = 1;
-            renderValidationTable();
+        function renderAdminRekapTable() {
+            const tbody = document.getElementById('tabel-admin-rekap-body');
+            const tfoot = document.getElementById('tabel-admin-rekap-foot');
+            if (!tbody) return;
+
+            const adminRekapMap = {};
+            Object.keys(totalRegenciesByProvince).forEach(provKey => {
+                adminRekapMap[provKey] = {
+                    provinsi: toTitleCase(provKey),
+                    provKey: provKey,
+                    perluValidasiUlang: 0,
+                    belumTervalidasi: 0
+                };
+            });
+
+            rawDatabase.forEach(item => {
+                const provKey = item.provinsi ? cleanName(item.provinsi) : '';
+                if (provKey && adminRekapMap[provKey]) {
+                    if (item.status_validasi === 'Perlu Validasi Ulang') adminRekapMap[provKey].perluValidasiUlang++;
+                    else if (item.status_validasi === 'Belum Tervalidasi') adminRekapMap[provKey].belumTervalidasi++;
+                }
+            });
+
+            let list = Object.values(adminRekapMap).sort((a, b) => a.provinsi.localeCompare(b.provinsi));
+            if (searchAdminRekapText) {
+                list = list.filter(r => r.provinsi.toLowerCase().includes(searchAdminRekapText));
+            }
+
+            tbody.innerHTML = '';
+            let sumPerluVal = 0, sumBelumVal = 0;
+
+            list.forEach((item, idx) => {
+                sumPerluVal += item.perluValidasiUlang;
+                sumBelumVal += item.belumTervalidasi;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-purple-50/30 text-xs";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-center font-bold text-slate-400">${idx + 1}</td>
+                    <td class="py-3 px-4 font-bold text-slate-800">${item.provinsi}</td>
+                    <td class="py-3 px-4 text-center font-bold text-indigo-700 bg-indigo-50/20">${item.perluValidasiUlang}</td>
+                    <td class="py-3 px-4 text-center font-bold text-amber-700 bg-amber-50/20">${item.belumTervalidasi}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (tfoot) {
+                tfoot.innerHTML = `
+                    <tr class="text-xs">
+                        <td colspan="2" class="py-3.5 px-4 text-slate-900 font-extrabold uppercase text-right">Total Akumulasi Admin</td>
+                        <td class="py-3.5 px-4 text-center font-extrabold text-indigo-800 bg-indigo-100/50">${sumPerluVal}</td>
+                        <td class="py-3.5 px-4 text-center font-extrabold text-amber-800 bg-amber-100/50">${sumBelumVal}</td>
+                    </tr>
+                `;
+            }
+        }
+
+        function onSearchTabelAdminRekap() {
+            searchAdminRekapText = document.getElementById('search-tabel-admin-rekap').value.toLowerCase().trim();
+            renderAdminRekapTable();
+        }
+
+        // ================= EXPORT FUNCTIONS =================
+
+        function exportDuplicatesToExcel() {
+            const data = duplicateList.map((item, idx) => ({
+                "No": idx + 1,
+                "Provinsi": item.provinsi,
+                "Kab / Kota": item.kabkota,
+                "Kecamatan": item.kecamatan,
+                "Desa / Kelurahan": item.desa,
+                "ID Terlibat": Array.from(item.ids).join(', '),
+                "Jumlah Entri Baris": item.entriesCount
+            }));
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Audit Duplikat");
+            XLSX.writeFile(wb, `Audit_Duplikat_Lokus_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function exportPemanfAnomaliesToExcel() {
+            const data = pemanfAnomalyList.map((item, idx) => ({
+                "No": idx + 1,
+                "Lokus ID": item.id,
+                "Tahun": item.tahun,
+                "Provinsi": item.provinsi,
+                "Kab / Kota": item.kabkota,
+                "Desa": item.desa,
+                "Isian Nilai Pemanfaatan": item.pemanf_aktif
+            }));
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Anomali Pemanfaatan");
+            XLSX.writeFile(wb, `Anomali_Pemanfaatan_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function exportUpdateAnomaliesToExcel() {
+            const data = updateAnomalyList.map((item, idx) => ({
+                "No": idx + 1,
+                "Lokus ID": item.id,
+                "Tahun": item.tahun,
+                "Provinsi": item.provinsi,
+                "Kab / Kota": item.kabkota,
+                "Desa": item.desa,
+                "Isian Nilai Pemutakhiran": item.pembaruan
+            }));
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Anomali Pemutakhiran");
+            XLSX.writeFile(wb, `Anomali_Pemutakhiran_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function exportIncompleteToExcel() {
+            const data = incompleteList.map((item, idx) => ({
+                "No": idx + 1,
+                "Lokus ID": item.id,
+                "Tahun": item.tahun,
+                "Provinsi": item.provinsi,
+                "Kab / Kota": item.kabkota,
+                "Desa": item.desa,
+                "Bagian Kosong": item.missingFields
+            }));
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Data Belum Lengkap");
+            XLSX.writeFile(wb, `Data_Belum_Lengkap_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
 
         function exportValidationToExcel() {
-            const worksheet = XLSX.utils.json_to_sheet(validationList);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Daftar Validasi");
-            XLSX.writeFile(workbook, `Daftar_Antrean_Validasi_${new Date().toISOString().slice(0,10)}.xlsx`);
+            const data = validationList.map((item, idx) => ({
+                "No": idx + 1,
+                "Lokus ID": item.id,
+                "Provinsi": item.provinsi,
+                "Kab / Kota": item.kabkota,
+                "Kecamatan": item.kecamatan,
+                "Desa / Kelurahan": item.desa,
+                "Status Validasi": item.status_validasi
+            }));
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Daftar Perlu Validasi");
+            XLSX.writeFile(wb, `Daftar_Perlu_Validasi_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
+
+        function exportAdminRekapToExcel() {
+            const adminRekapMap = {};
+            Object.keys(totalRegenciesByProvince).forEach(provKey => {
+                adminRekapMap[provKey] = {
+                    "No": 0,
+                    "Provinsi": toTitleCase(provKey),
+                    "Perlu Validasi Ulang": 0,
+                    "Belum Tervalidasi": 0
+                };
+            });
+
+            rawDatabase.forEach(item => {
+                const provKey = item.provinsi ? cleanName(item.provinsi) : '';
+                if (provKey && adminRekapMap[provKey]) {
+                    if (item.status_validasi === 'Perlu Validasi Ulang') adminRekapMap[provKey]["Perlu Validasi Ulang"]++;
+                    else if (item.status_validasi === 'Belum Tervalidasi') adminRekapMap[provKey]["Belum Tervalidasi"]++;
+                }
+            });
+
+            const dataArray = Object.values(adminRekapMap)
+                .sort((a, b) => a.Provinsi.localeCompare(b.Provinsi))
+                .map((row, idx) => {
+                    row["No"] = idx + 1;
+                    return row;
+                });
+
+            const ws = XLSX.utils.json_to_sheet(dataArray);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Rekap Validasi Admin");
+            XLSX.writeFile(wb, `Rekap_Validasi_Admin_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        // ================= ADMIN MODAL & GATEWAY =================
 
         function openAdminGateModal() {
             const modal = document.getElementById('admin-gate-modal');
-            const box = document.getElementById('admin-modal-box');
-            document.getElementById('admin-error-panel').classList.add('hidden');
-            document.getElementById('admin-pin-field').value = '';
+            const modalBox = document.getElementById('admin-modal-box');
+            const pinInput = document.getElementById('admin-pin-field');
+            const errPanel = document.getElementById('admin-error-panel');
 
+            pinInput.value = '';
+            errPanel.classList.add('hidden');
             modal.classList.remove('hidden');
+
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
-                box.classList.remove('scale-95');
+                modalBox.classList.remove('scale-95');
+                pinInput.focus();
             }, 10);
         }
 
         function closeAdminGateModal() {
             const modal = document.getElementById('admin-gate-modal');
-            const box = document.getElementById('admin-modal-box');
+            const modalBox = document.getElementById('admin-modal-box');
+
             modal.classList.add('opacity-0');
-            box.classList.add('scale-95');
+            modalBox.classList.add('scale-95');
             setTimeout(() => {
                 modal.classList.add('hidden');
             }, 300);
@@ -2448,8 +2372,7 @@
             const pinInput = document.getElementById('admin-pin-field').value.trim();
             const errPanel = document.getElementById('admin-error-panel');
 
-            // Default Admin Security PIN validation ('1234' or 'admin123')
-            if (pinInput === "1234" || pinInput === "admin123" || pinInput === "admin") {
+            if (pinInput === "1234") {
                 closeAdminGateModal();
                 document.getElementById('view-dashboard').classList.add('hidden');
                 document.getElementById('view-admin').classList.remove('hidden');
