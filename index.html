@@ -74,7 +74,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <button type="button" onclick="exitAdminWorkspace(); this.blur();" class="flex items-center gap-3 text-left hover:opacity-90 transition-opacity focus:outline-none rounded-xl">
                 <div class="p-1.5 bg-white/10 backdrop-blur rounded-xl flex items-center justify-center border border-white/20 shadow-inner">
-                    <img src="http://anwar.full.diskon.cloud/Logo1.png" alt="Logo Rumah DataKu" class="w-8 h-8 object-contain" onerror="this.src='https://placehold.co/32x32/0284c7/ffffff?text=RDK'">
+                    <img src="Logo.png" alt="Logo Rumah DataKu" class="w-8 h-8 object-contain" onerror="this.src='https://placehold.co/32x32/0284c7/ffffff?text=RDK'">
                 </div>
                 <div>
                     <h1 class="font-extrabold text-white tracking-tight text-base sm:text-lg flex items-center gap-2">
@@ -120,7 +120,7 @@
                             <option value="all">Semua Status Validasi</option>
                             <option value="Sesuai">Sesuai</option>
                             <option value="Butuh Perbaikan">Butuh Perbaikan</option>
-                            <option value="Bukti Dukung Belum lengkap">Bukti Dukung Belum lengkap</option>
+                            <option value="belum Ada Bukti Dukung">belum Ada Bukti Dukung</option>
                         </select>
                     </div>
                     <!-- Filter Tahun -->
@@ -341,7 +341,7 @@
                                 <th class="py-3.5 px-4 text-center text-sky-700 bg-sky-50/50">Target</th>
                                 <th class="py-3.5 px-4 text-center text-emerald-700">Sesuai</th>
                                 <th class="py-3.5 px-4 text-center text-rose-700">Butuh Perbaikan</th>
-                                <th class="py-3.5 px-4 text-center text-orange-700">Bukti Dukung Belum lengkap</th>
+                                <th class="py-3.5 px-4 text-center text-orange-700">belum Ada Bukti Dukung</th>
                             </tr>
                         </thead>
                         <tbody id="tabel-rekap-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
@@ -919,7 +919,7 @@
             { id: "1003", Status: "Belum Tervalidasi", status_kelengkapan: "Lengkap", perbaikan: "-", tahun: "2026", provinsi: "JAWA BARAT", kabkota: "BANDUNG", kecamatan: "COBLONG", desa: "DAGO", pembaruan: "1 Kali", pemanf_aktif: "Ya", pemanf_jenis: "Perencanaan" },
             { id: "1004", Status: "Butuh Perbaikan", status_kelengkapan: "Belum Lengkap", perbaikan: "Belum", tahun: "2025", provinsi: "JAWA BARAT", kabkota: "BOGOR", kecamatan: "CIBINONG", desa: "PAKANSARI", pembaruan: "Tidak Ada Keterangan", pemanf_aktif: "Tidak", pemanf_jenis: "" },
             { id: "1005", Status: "Sesuai", status_kelengkapan: "Lengkap", perbaikan: "Sudah", tahun: "2025", provinsi: "DI YOGYAKARTA", kabkota: "KULON PROGO", kecamatan: "WATES", desa: "WATES", pembaruan: "2 Kali", pemanf_aktif: "Ya", pemanf_jenis: "Perencanaan" },
-            { id: "1006", Status: "Bukti Dukung Belum lengkap", status_kelengkapan: "Belum Lengkap", perbaikan: "Belum", tahun: "2026", provinsi: "DI YOGYAKARTA", kabkota: "KULON PROGO", kecamatan: "TEMON", desa: "GLAGAH", pembaruan: "1 Kali", pemanf_aktif: "Ya", pemanf_jenis: "Intervensi" },
+            { id: "1006", Status: "belum Ada Bukti Dukung", status_kelengkapan: "Belum Lengkap", perbaikan: "Belum", tahun: "2026", provinsi: "DI YOGYAKARTA", kabkota: "KULON PROGO", kecamatan: "TEMON", desa: "GLAGAH", pembaruan: "1 Kali", pemanf_aktif: "Ya", pemanf_jenis: "Intervensi" },
             { id: "2001", Status: "Perlu Validasi Ulang", status_kelengkapan: "Lengkap", perbaikan: "Sudah", tahun: "2025", provinsi: "JAWA TENGAH", kabkota: "SEMARANG", kecamatan: "BANYUMANIK", desa: "MAJU JAYA", pembaruan: "1 Kali", pemanf_aktif: "Ya", pemanf_jenis: "Perencanaan" },
             { id: "2002", Status: "Sesuai", status_kelengkapan: "Lengkap", perbaikan: "Sudah", tahun: "2025", provinsi: "JAWA TENGAH", kabkota: "SEMARANG", kecamatan: "BANYUMANIK", desa: "MAJU JAYA", pembaruan: "2 Kali", pemanf_aktif: "Ya", pemanf_jenis: "Intervensi" },
             { id: "3009", Status: "Belum Tervalidasi", status_kelengkapan: "Lengkap", perbaikan: "-", tahun: "2026", provinsi: "BANTEN", kabkota: "TANGERANG", kecamatan: "CISAUK", desa: "SUKA MAKMUR", pembaruan: "2 Kali", pemanf_aktif: "Ya", pemanf_jenis: "Perencanaan" },
@@ -1024,8 +1024,9 @@
                 let statusVal = "Belum Tervalidasi";
                 const lowerVal = rawStatusVal.toLowerCase();
 
-                if (lowerVal.includes("bukti dukung") || lowerVal.includes("belum lengkap")) {
-                    statusVal = "Bukti Dukung Belum lengkap";
+                // Penyesuaian kriteria narasi status validasi baru
+                if (lowerVal.includes("bukti dukung") || lowerVal.includes("belum ada bukti") || lowerVal.includes("belum lengkap")) {
+                    statusVal = "belum Ada Bukti Dukung";
                 } else if (lowerVal.includes("sesuai")) {
                     statusVal = "Sesuai";
                 } else if (lowerVal.includes("butuh perbaikan") || (lowerVal.includes("perbaikan") && !lowerVal.includes("ulang"))) {
@@ -1035,7 +1036,7 @@
                 } else if (lowerVal.includes("tervalidasi") || lowerVal.includes("belum")) {
                     statusVal = "Belum Tervalidasi";
                 } else if (rawStatusVal !== '') {
-                    statusVal = toTitleCase(rawStatusVal);
+                    statusVal = rawStatusVal;
                 }
 
                 let rawKelengkapan = statusKelengkapanKey && item[statusKelengkapanKey] ? item[statusKelengkapanKey].toString().trim() : '';
@@ -1148,7 +1149,6 @@
             renderCharts();
             renderKabkotaList();
             
-            // Rekap tables aggregations
             renderRekapTable();
             renderAdminRekapTable();
             
@@ -1525,7 +1525,7 @@
             });
         }
 
-        // RENDER REKAP TABLE: Detached from main filters except Filter Tahun
+        // RENDER REKAP TABLE
         function renderRekapTable() {
             const tbody = document.getElementById('tabel-rekap-body');
             const tfoot = document.getElementById('tabel-rekap-foot');
@@ -1576,7 +1576,7 @@
                         rekapMap[provKey].sesuai++;
                     } else if (item.status_validasi === "Butuh Perbaikan") {
                         rekapMap[provKey].butuhPerbaikan++;
-                    } else if (item.status_validasi === "Bukti Dukung Belum lengkap") {
+                    } else if (item.status_validasi === "belum Ada Bukti Dukung") {
                         rekapMap[provKey].buktiDukungBelumLengkap++;
                     }
                 }
@@ -1643,10 +1643,7 @@
             renderRekapTable();
         }
 
-        function renderMainTable() {
-            const tbody = document.getElementById('tabel-lokus-body');
-            if (!tbody) return;
-
+        function getFilteredMainTableRecords() {
             const uniqueRecordsMap = new Map();
             filteredDatabase.forEach(item => {
                 if (!uniqueRecordsMap.has(item.id)) {
@@ -1667,6 +1664,14 @@
                     item.status_validasi.toLowerCase().includes(term)
                 );
             }
+            return records;
+        }
+
+        function renderMainTable() {
+            const tbody = document.getElementById('tabel-lokus-body');
+            if (!tbody) return;
+
+            const records = getFilteredMainTableRecords();
 
             const totalRows = records.length;
             const totalPages = Math.ceil(totalRows / rowsPerPage) || 1;
@@ -1692,25 +1697,25 @@
                         badgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
                     } else if (item.status_validasi === "Butuh Perbaikan") {
                         badgeClass = "bg-rose-50 text-rose-700 border-rose-200";
-                    } else if (item.status_validasi === "Bukti Dukung Belum lengkap") {
+                    } else if (item.status_validasi === "belum Ada Bukti Dukung") {
                         badgeClass = "bg-orange-50 text-orange-700 border-orange-200";
                     }
 
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50/80 transition-colors";
+                    tr.className = "hover:bg-slate-50 transition-colors";
                     tr.innerHTML = `
                         <td class="py-3 px-4 text-center font-semibold text-slate-400">${startIdx + idx + 1}</td>
-                        <td class="py-3 px-4 font-extrabold text-sky-700">${item.id}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-sky-700">${item.id}</td>
                         <td class="py-3 px-4">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${badgeClass}">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold border ${badgeClass}">
                                 ${item.status_validasi}
                             </span>
                         </td>
-                        <td class="py-3 px-4 font-medium text-slate-600">${item.tahun}</td>
-                        <td class="py-3 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
-                        <td class="py-3 px-4 text-slate-700">${toTitleCase(item.kabkota)}</td>
-                        <td class="py-3 px-4 text-slate-600">${item.kecamatan || '-'}</td>
-                        <td class="py-3 px-4 text-slate-600">${item.desa || '-'}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-600">${item.tahun}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-800">${toTitleCase(item.provinsi)}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-800">${toTitleCase(item.kabkota)}</td>
+                        <td class="py-3 px-4 text-slate-600">${item.kecamatan}</td>
+                        <td class="py-3 px-4 text-slate-600">${item.desa}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -1718,9 +1723,14 @@
 
             document.getElementById('tabel-pagination-info').textContent = 
                 `Menampilkan ${totalRows > 0 ? startIdx + 1 : 0}-${endIdx} dari ${totalRows} baris`;
+            
+            document.getElementById('btn-prev-page').disabled = currentTablePage <= 1;
+            document.getElementById('btn-next-page').disabled = currentTablePage >= totalPages;
+        }
 
-            document.getElementById('btn-prev-page').disabled = (currentTablePage <= 1);
-            document.getElementById('btn-next-page').disabled = (currentTablePage >= totalPages);
+        function changePage(direction) {
+            currentTablePage += direction;
+            renderMainTable();
         }
 
         function onSearchTabelUtama() {
@@ -1729,39 +1739,31 @@
             renderMainTable();
         }
 
-        function changePage(direction) {
-            currentTablePage += direction;
-            renderMainTable();
-        }
-
-        // AUDIT LOGIC 1: Duplicate Detection
         function performDuplicateAudit() {
-            const desaMap = {};
+            const locMap = {};
             rawDatabase.forEach(item => {
-                if (item.desa && item.provinsi && item.kabkota) {
-                    const key = `${item.provinsi}|${item.kabkota}|${item.kecamatan}|${item.desa}`.toUpperCase();
-                    if (!desaMap[key]) desaMap[key] = [];
-                    desaMap[key].push(item);
-                }
+                const key = `${item.provinsi}|${item.kabkota}|${item.kecamatan}|${item.desa}`.toUpperCase();
+                if (!locMap[key]) locMap[key] = [];
+                locMap[key].push(item);
             });
 
             duplicateList = [];
-            Object.entries(desaMap).forEach(([key, items]) => {
-                const uniqueIds = new Set(items.map(x => x.id));
-                if (uniqueIds.size > 1) {
-                    const first = items[0];
+            Object.keys(locMap).forEach(key => {
+                const items = locMap[key];
+                const uniqueIds = [...new Set(items.map(x => x.id))];
+                if (uniqueIds.length > 1) {
                     duplicateList.push({
-                        provinsi: toTitleCase(first.provinsi),
-                        kabkota: toTitleCase(first.kabkota),
-                        kecamatan: first.kecamatan,
-                        desa: first.desa,
-                        ids: Array.from(uniqueIds).join(', '),
-                        count: items.length,
-                        issue: `Lokasi Desa/Kelurahan sama didaftarkan dengan ${uniqueIds.size} ID unik yang berbeda.`
+                        provinsi: toTitleCase(items[0].provinsi),
+                        kabkota: toTitleCase(items[0].kabkota),
+                        kecamatan: items[0].kecamatan,
+                        desa: items[0].desa,
+                        ids: uniqueIds,
+                        totalEntries: items.length
                     });
                 }
             });
 
+            currentDupPage = 1;
             renderDuplicateTable();
         }
 
@@ -1777,7 +1779,7 @@
                     item.kabkota.toLowerCase().includes(term) ||
                     item.kecamatan.toLowerCase().includes(term) ||
                     item.desa.toLowerCase().includes(term) ||
-                    item.ids.toLowerCase().includes(term)
+                    item.ids.some(id => id.toLowerCase().includes(term))
                 );
             }
 
@@ -1795,23 +1797,23 @@
                     <tr>
                         <td colspan="8" class="py-8 text-center text-slate-400 font-medium">
                             <i class="fa-solid fa-circle-check text-emerald-500 text-lg mb-1 block"></i>
-                            Tidak ditemukan konflik duplikasi ID spasial.
+                            Tidak ditemukan konflik duplikasi ID spasial pada lokasi desa/kelurahan.
                         </td>
                     </tr>
                 `;
             } else {
                 pageRecords.forEach((item, idx) => {
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-amber-50/50 transition-colors";
+                    tr.className = "hover:bg-amber-50/30 transition-colors";
                     tr.innerHTML = `
                         <td class="py-3 px-4 text-center font-semibold text-slate-400">${startIdx + idx + 1}</td>
                         <td class="py-3 px-4 font-bold text-slate-800">${item.provinsi}</td>
-                        <td class="py-3 px-4 text-slate-700">${item.kabkota}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-800">${item.kabkota}</td>
                         <td class="py-3 px-4 text-slate-600">${item.kecamatan}</td>
-                        <td class="py-3 px-4 font-bold text-amber-900">${item.desa}</td>
-                        <td class="py-3 px-4 text-center font-mono text-xs font-bold text-amber-700">${item.ids}</td>
-                        <td class="py-3 px-4 text-center font-extrabold text-slate-900">${item.count} Baris</td>
-                        <td class="py-3 px-4 text-xs text-slate-600">${item.issue}</td>
+                        <td class="py-3 px-4 text-slate-600">${item.desa}</td>
+                        <td class="py-3 px-4 text-center font-mono font-bold text-amber-700">${item.ids.join(', ')}</td>
+                        <td class="py-3 px-4 text-center font-bold text-slate-800">${item.totalEntries}</td>
+                        <td class="py-3 px-4 text-amber-800 font-medium">Terdapat ${item.ids.length} ID unik berbeda terdaftar di lokasi spasial desa yang sama.</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -1819,9 +1821,14 @@
 
             document.getElementById('tabel-duplikat-pagination-info').textContent = 
                 `Menampilkan ${totalRows > 0 ? startIdx + 1 : 0}-${endIdx} dari ${totalRows} baris duplikat`;
+            
+            document.getElementById('btn-prev-dup-page').disabled = currentDupPage <= 1;
+            document.getElementById('btn-next-dup-page').disabled = currentDupPage >= totalPages;
+        }
 
-            document.getElementById('btn-prev-dup-page').disabled = (currentDupPage <= 1);
-            document.getElementById('btn-next-dup-page').disabled = (currentDupPage >= totalPages);
+        function changeDupPage(dir) {
+            currentDupPage += dir;
+            renderDuplicateTable();
         }
 
         function onSearchTabelDuplikat() {
@@ -1830,54 +1837,46 @@
             renderDuplicateTable();
         }
 
-        function changeDupPage(direction) {
-            currentDupPage += direction;
-            renderDuplicateTable();
-        }
-
-        // AUDIT LOGIC 2 & 3 & 4: Anomalies & Incomplete Audit
         function performAnomaliesAudits() {
             pemanfAnomalyList = [];
             updateAnomalyList = [];
             incompleteList = [];
 
             rawDatabase.forEach(item => {
-                const valPemanf = item.pemanf_aktif;
-                if (valPemanf !== "" && valPemanf !== "Ya" && valPemanf !== "Tidak") {
-                    pemanfAnomalyList.push({
-                        ...item,
-                        issue: `Nilai "${valPemanf}" tidak baku. Standar: "Ya" atau "Tidak".`
-                    });
+                const pemanfVal = item.pemanf_aktif ? item.pemanf_aktif.trim() : '';
+                const updateVal = item.pembaruan ? item.pembaruan.trim() : '';
+
+                if (pemanfVal !== '' && !['Ya', 'Tidak'].includes(pemanfVal)) {
+                    pemanfAnomalyList.push(item);
                 }
 
-                const valUpdate = item.pembaruan;
-                const validUpdateValues = ["1 Kali", "2 Kali", "> 2 Kali", "Tidak Ada Keterangan"];
-                if (valUpdate !== "" && !validUpdateValues.includes(valUpdate)) {
-                    updateAnomalyList.push({
-                        ...item,
-                        issue: `Nilai "${valUpdate}" tidak baku.`
-                    });
+                if (updateVal !== '' && !['1 Kali', '2 Kali', '> 2 Kali'].includes(updateVal)) {
+                    updateAnomalyList.push(item);
                 }
 
-                if (valPemanf === "" || valUpdate === "") {
-                    let missing = [];
-                    if (valUpdate === "") missing.push("Pemutakhiran Data");
-                    if (valPemanf === "") missing.push("Status Pemanfaatan");
+                if (pemanfVal === '' || updateVal === '') {
+                    const emptyFields = [];
+                    if (updateVal === '') emptyFields.push('Pemutakhiran Data');
+                    if (pemanfVal === '') emptyFields.push('Pemanfaatan Aktif');
 
                     incompleteList.push({
                         ...item,
-                        missingFields: missing.join(" & "),
-                        issue: "Harap melengkapi data pada portal penginputan."
+                        empty_fields: emptyFields.join(' & ')
                     });
                 }
             });
 
-            renderPemanfAnomaliesTable();
-            renderUpdateAnomaliesTable();
+            currentPemanfPage = 1;
+            renderPemanfTable();
+
+            currentUpdatePage = 1;
+            renderUpdateTable();
+
+            currentIncompletePage = 1;
             renderIncompleteTable();
         }
 
-        function renderPemanfAnomaliesTable() {
+        function renderPemanfTable() {
             const tbody = document.getElementById('tabel-pemanf-body');
             if (!tbody) return;
 
@@ -1887,7 +1886,9 @@
                 records = records.filter(item => 
                     item.id.toLowerCase().includes(term) ||
                     item.provinsi.toLowerCase().includes(term) ||
-                    item.desa.toLowerCase().includes(term)
+                    item.kabkota.toLowerCase().includes(term) ||
+                    item.desa.toLowerCase().includes(term) ||
+                    item.pemanf_aktif.toLowerCase().includes(term)
                 );
             }
 
@@ -1905,23 +1906,23 @@
                     <tr>
                         <td colspan="8" class="py-8 text-center text-slate-400 font-medium">
                             <i class="fa-solid fa-circle-check text-emerald-500 text-lg mb-1 block"></i>
-                            Semua isian status pemanfaatan data telah baku.
+                            Seluruh data kolom Pemanfaatan Aktif telah terstandarisasi dengan sempurna (Ya / Tidak).
                         </td>
                     </tr>
                 `;
             } else {
                 pageRecords.forEach((item, idx) => {
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-rose-50/50 transition-colors";
+                    tr.className = "hover:bg-rose-50/30 transition-colors";
                     tr.innerHTML = `
                         <td class="py-3 px-4 text-center font-semibold text-slate-400">${startIdx + idx + 1}</td>
-                        <td class="py-3 px-4 font-extrabold text-rose-700">${item.id}</td>
-                        <td class="py-3 px-4 font-medium text-slate-600">${item.tahun}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-rose-700">${item.id}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-600">${item.tahun}</td>
                         <td class="py-3 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
-                        <td class="py-3 px-4 text-slate-700">${toTitleCase(item.kabkota)}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-800">${toTitleCase(item.kabkota)}</td>
                         <td class="py-3 px-4 text-slate-600">${item.desa}</td>
-                        <td class="py-3 px-4 text-center font-bold text-rose-800 bg-rose-100/50 rounded-lg">${item.pemanf_aktif}</td>
-                        <td class="py-3 px-4 text-xs text-slate-600">${item.issue}</td>
+                        <td class="py-3 px-4 text-center font-bold text-rose-700 bg-rose-50/50">${item.pemanf_aktif}</td>
+                        <td class="py-3 px-4 text-slate-600">Ubah entri nilai ke opsi standar: "Ya" atau "Tidak".</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -1929,23 +1930,23 @@
 
             document.getElementById('tabel-pemanf-pagination-info').textContent = 
                 `Menampilkan ${totalRows > 0 ? startIdx + 1 : 0}-${endIdx} dari ${totalRows} baris anomali`;
+            
+            document.getElementById('btn-prev-pemanf-page').disabled = currentPemanfPage <= 1;
+            document.getElementById('btn-next-pemanf-page').disabled = currentPemanfPage >= totalPages;
+        }
 
-            document.getElementById('btn-prev-pemanf-page').disabled = (currentPemanfPage <= 1);
-            document.getElementById('btn-next-pemanf-page').disabled = (currentPemanfPage >= totalPages);
+        function changePemanfPage(dir) {
+            currentPemanfPage += dir;
+            renderPemanfTable();
         }
 
         function onSearchTabelPemanf() {
             searchPemanfText = document.getElementById('search-tabel-pemanf').value.trim();
             currentPemanfPage = 1;
-            renderPemanfAnomaliesTable();
+            renderPemanfTable();
         }
 
-        function changePemanfPage(direction) {
-            currentPemanfPage += direction;
-            renderPemanfAnomaliesTable();
-        }
-
-        function renderUpdateAnomaliesTable() {
+        function renderUpdateTable() {
             const tbody = document.getElementById('tabel-update-body');
             if (!tbody) return;
 
@@ -1955,7 +1956,9 @@
                 records = records.filter(item => 
                     item.id.toLowerCase().includes(term) ||
                     item.provinsi.toLowerCase().includes(term) ||
-                    item.desa.toLowerCase().includes(term)
+                    item.kabkota.toLowerCase().includes(term) ||
+                    item.desa.toLowerCase().includes(term) ||
+                    item.pembaruan.toLowerCase().includes(term)
                 );
             }
 
@@ -1973,23 +1976,23 @@
                     <tr>
                         <td colspan="8" class="py-8 text-center text-slate-400 font-medium">
                             <i class="fa-solid fa-circle-check text-emerald-500 text-lg mb-1 block"></i>
-                            Semua isian pemutakhiran data telah terstandar.
+                            Seluruh data kolom Pemutakhiran telah sesuai dengan standar ("1 Kali", "2 Kali", atau "> 2 Kali").
                         </td>
                     </tr>
                 `;
             } else {
                 pageRecords.forEach((item, idx) => {
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-violet-50/50 transition-colors";
+                    tr.className = "hover:bg-violet-50/30 transition-colors";
                     tr.innerHTML = `
                         <td class="py-3 px-4 text-center font-semibold text-slate-400">${startIdx + idx + 1}</td>
-                        <td class="py-3 px-4 font-extrabold text-violet-700">${item.id}</td>
-                        <td class="py-3 px-4 font-medium text-slate-600">${item.tahun}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-violet-700">${item.id}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-600">${item.tahun}</td>
                         <td class="py-3 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
-                        <td class="py-3 px-4 text-slate-700">${toTitleCase(item.kabkota)}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-800">${toTitleCase(item.kabkota)}</td>
                         <td class="py-3 px-4 text-slate-600">${item.desa}</td>
-                        <td class="py-3 px-4 text-center font-bold text-violet-800 bg-violet-100/50 rounded-lg">${item.pembaruan}</td>
-                        <td class="py-3 px-4 text-xs text-slate-600">${item.issue}</td>
+                        <td class="py-3 px-4 text-center font-bold text-violet-700 bg-violet-50/50">${item.pembaruan}</td>
+                        <td class="py-3 px-4 text-slate-600">Sesuaikan dengan standar frekuensi update resmi.</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -1997,20 +2000,20 @@
 
             document.getElementById('tabel-update-pagination-info').textContent = 
                 `Menampilkan ${totalRows > 0 ? startIdx + 1 : 0}-${endIdx} dari ${totalRows} baris anomali`;
+            
+            document.getElementById('btn-prev-update-page').disabled = currentUpdatePage <= 1;
+            document.getElementById('btn-next-update-page').disabled = currentUpdatePage >= totalPages;
+        }
 
-            document.getElementById('btn-prev-update-page').disabled = (currentUpdatePage <= 1);
-            document.getElementById('btn-next-update-page').disabled = (currentUpdatePage >= totalPages);
+        function changeUpdatePage(dir) {
+            currentUpdatePage += dir;
+            renderUpdateTable();
         }
 
         function onSearchTabelUpdate() {
             searchUpdateText = document.getElementById('search-tabel-update').value.trim();
             currentUpdatePage = 1;
-            renderUpdateAnomaliesTable();
-        }
-
-        function changeUpdatePage(direction) {
-            currentUpdatePage += direction;
-            renderUpdateAnomaliesTable();
+            renderUpdateTable();
         }
 
         function renderIncompleteTable() {
@@ -2023,7 +2026,9 @@
                 records = records.filter(item => 
                     item.id.toLowerCase().includes(term) ||
                     item.provinsi.toLowerCase().includes(term) ||
-                    item.desa.toLowerCase().includes(term)
+                    item.kabkota.toLowerCase().includes(term) ||
+                    item.desa.toLowerCase().includes(term) ||
+                    item.empty_fields.toLowerCase().includes(term)
                 );
             }
 
@@ -2041,23 +2046,23 @@
                     <tr>
                         <td colspan="8" class="py-8 text-center text-slate-400 font-medium">
                             <i class="fa-solid fa-circle-check text-emerald-500 text-lg mb-1 block"></i>
-                            Tidak ada kolom data esensial yang kosong.
+                            Tidak ditemukan data dengan sel kosong / NULL pada kolom indikator utama.
                         </td>
                     </tr>
                 `;
             } else {
                 pageRecords.forEach((item, idx) => {
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-sky-50/50 transition-colors";
+                    tr.className = "hover:bg-sky-50/30 transition-colors";
                     tr.innerHTML = `
                         <td class="py-3 px-4 text-center font-semibold text-slate-400">${startIdx + idx + 1}</td>
-                        <td class="py-3 px-4 font-extrabold text-sky-700">${item.id}</td>
-                        <td class="py-3 px-4 font-medium text-slate-600">${item.tahun}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-sky-700">${item.id}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-600">${item.tahun}</td>
                         <td class="py-3 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
-                        <td class="py-3 px-4 text-slate-700">${toTitleCase(item.kabkota)}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-800">${toTitleCase(item.kabkota)}</td>
                         <td class="py-3 px-4 text-slate-600">${item.desa}</td>
-                        <td class="py-3 px-4 text-center font-bold text-amber-800 bg-amber-100/50 rounded-lg">${item.missingFields}</td>
-                        <td class="py-3 px-4 text-xs text-slate-600">${item.issue}</td>
+                        <td class="py-3 px-4 text-center font-bold text-amber-700 bg-amber-50/50">${item.empty_fields}</td>
+                        <td class="py-3 px-4 text-slate-600">Lengkapi isian data pada kolom yang masih kosong.</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -2065,9 +2070,14 @@
 
             document.getElementById('tabel-incomplete-pagination-info').textContent = 
                 `Menampilkan ${totalRows > 0 ? startIdx + 1 : 0}-${endIdx} dari ${totalRows} baris belum lengkap`;
+            
+            document.getElementById('btn-prev-incomplete-page').disabled = currentIncompletePage <= 1;
+            document.getElementById('btn-next-incomplete-page').disabled = currentIncompletePage >= totalPages;
+        }
 
-            document.getElementById('btn-prev-incomplete-page').disabled = (currentIncompletePage <= 1);
-            document.getElementById('btn-next-incomplete-page').disabled = (currentIncompletePage >= totalPages);
+        function changeIncompletePage(dir) {
+            currentIncompletePage += dir;
+            renderIncompleteTable();
         }
 
         function onSearchTabelIncomplete() {
@@ -2076,16 +2086,12 @@
             renderIncompleteTable();
         }
 
-        function changeIncompletePage(direction) {
-            currentIncompletePage += direction;
-            renderIncompleteTable();
-        }
-
-        // AUDIT LOGIC 5: Validation Queue
         function performValidationAudit() {
-            validationList = rawDatabase.filter(item => 
-                item.status_validasi === "Belum Tervalidasi" || item.status_validasi === "Perlu Validasi Ulang"
-            );
+            validationList = rawDatabase.filter(item => {
+                return item.status_validasi === "Belum Tervalidasi" || item.status_validasi === "Perlu Validasi Ulang";
+            });
+
+            currentValidationPage = 1;
             renderValidationTable();
         }
 
@@ -2110,7 +2116,8 @@
                     item.provinsi.toLowerCase().includes(term) ||
                     item.kabkota.toLowerCase().includes(term) ||
                     item.kecamatan.toLowerCase().includes(term) ||
-                    item.desa.toLowerCase().includes(term)
+                    item.desa.toLowerCase().includes(term) ||
+                    item.status_validasi.toLowerCase().includes(term)
                 );
             }
 
@@ -2128,32 +2135,30 @@
                     <tr>
                         <td colspan="8" class="py-8 text-center text-slate-400 font-medium">
                             <i class="fa-solid fa-circle-check text-emerald-500 text-lg mb-1 block"></i>
-                            Tidak ada entri lokus yang membutuhkan validasi.
+                            Tidak ada data lokasi yang membutuhkan antrean proses verifikasi/validasi.
                         </td>
                     </tr>
                 `;
             } else {
                 pageRecords.forEach((item, idx) => {
-                    const isReval = item.status_validasi === "Perlu Validasi Ulang";
-                    const badgeClass = isReval ? "bg-indigo-100 text-indigo-800 border-indigo-200" : "bg-amber-100 text-amber-800 border-amber-200";
+                    const isRevalid = item.status_validasi === "Perlu Validasi Ulang";
+                    const badgeClass = isRevalid ? "bg-indigo-100 text-indigo-800 border-indigo-200" : "bg-amber-100 text-amber-800 border-amber-200";
 
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-indigo-50/40 transition-colors";
+                    tr.className = "hover:bg-indigo-50/30 transition-colors";
                     tr.innerHTML = `
                         <td class="py-3 px-4 text-center font-semibold text-slate-400">${startIdx + idx + 1}</td>
-                        <td class="py-3 px-4 font-extrabold text-indigo-900">${item.id}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-indigo-700">${item.id}</td>
                         <td class="py-3 px-4 font-bold text-slate-800">${toTitleCase(item.provinsi)}</td>
-                        <td class="py-3 px-4 text-slate-700">${toTitleCase(item.kabkota)}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-800">${toTitleCase(item.kabkota)}</td>
                         <td class="py-3 px-4 text-slate-600">${item.kecamatan}</td>
                         <td class="py-3 px-4 text-slate-600">${item.desa}</td>
                         <td class="py-3 px-4">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${badgeClass}">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold border ${badgeClass}">
                                 ${item.status_validasi}
                             </span>
                         </td>
-                        <td class="py-3 px-4 text-xs font-semibold text-slate-600">
-                            ${isReval ? 'Lakukan pengecekan ulang berkas revisi' : 'Lakukan verifikasi lapangan / kelengkapan data'}
-                        </td>
+                        <td class="py-3 px-4 text-slate-600">${isRevalid ? 'Verifikasi ulang bukti perbaikan yang dikirim.' : 'Lakukan peninjauan awal kelengkapan dokumen.'}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -2161,9 +2166,14 @@
 
             document.getElementById('tabel-validation-pagination-info').textContent = 
                 `Menampilkan ${totalRows > 0 ? startIdx + 1 : 0}-${endIdx} dari ${totalRows} Lokus`;
+            
+            document.getElementById('btn-prev-val-page').disabled = currentValidationPage <= 1;
+            document.getElementById('btn-next-val-page').disabled = currentValidationPage >= totalPages;
+        }
 
-            document.getElementById('btn-prev-val-page').disabled = (currentValidationPage <= 1);
-            document.getElementById('btn-next-val-page').disabled = (currentValidationPage >= totalPages);
+        function changeValidationPage(dir) {
+            currentValidationPage += dir;
+            renderValidationTable();
         }
 
         function onValFilterChange() {
@@ -2179,29 +2189,10 @@
             renderValidationTable();
         }
 
-        function changeValidationPage(direction) {
-            currentValidationPage += direction;
-            renderValidationTable();
-        }
-
-        // RENDER ADMIN REKAP TABLE
         function renderAdminRekapTable() {
             const tbody = document.getElementById('tabel-admin-rekap-body');
             const tfoot = document.getElementById('tabel-admin-rekap-foot');
             if (!tbody) return;
-
-            const filterTahun = document.getElementById('filter-tahun') ? document.getElementById('filter-tahun').value : 'all';
-
-            const adminRekapDatabase = rawDatabase.filter(item => {
-                return (filterTahun === 'all') || (item.tahun === filterTahun);
-            });
-
-            const uniqueLokusMap = new Map();
-            adminRekapDatabase.forEach(item => {
-                if (!uniqueLokusMap.has(item.id)) {
-                    uniqueLokusMap.set(item.id, item);
-                }
-            });
 
             const adminRekapMap = {};
             const allProvKeys = Object.keys(totalRegenciesByProvince);
@@ -2214,7 +2205,7 @@
                 };
             });
 
-            uniqueLokusMap.forEach(item => {
+            rawDatabase.forEach(item => {
                 const provKey = item.provinsi ? cleanName(item.provinsi) : '';
                 if (provKey && adminRekapMap[provKey]) {
                     if (item.status_validasi === "Perlu Validasi Ulang") {
@@ -2238,7 +2229,7 @@
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="4" class="py-8 text-center text-slate-400">
-                            Tidak ada provinsi yang cocok dengan kata kunci "${searchAdminRekapText}"
+                            Tidak ada provinsi yang cocok dengan kata kunci pencarian "${searchAdminRekapText}"
                         </td>
                     </tr>
                 `;
@@ -2246,14 +2237,14 @@
                 return;
             }
 
-            let sumPerluValidasiUlang = 0, sumBelumTervalidasi = 0;
+            let sumPerluVal = 0, sumBelumVal = 0;
 
             list.forEach((item, idx) => {
-                sumPerluValidasiUlang += item.perluValidasiUlang;
-                sumBelumTervalidasi += item.belumTervalidasi;
+                sumPerluVal += item.perluValidasiUlang;
+                sumBelumVal += item.belumTervalidasi;
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-purple-50/40 transition-colors";
+                tr.className = "hover:bg-purple-50/30 transition-colors";
                 tr.innerHTML = `
                     <td class="py-3 px-4 text-center font-semibold text-slate-400">${idx + 1}</td>
                     <td class="py-3 px-4 font-bold text-slate-800">${item.provinsi}</td>
@@ -2265,9 +2256,9 @@
 
             tfoot.innerHTML = `
                 <tr>
-                    <td colspan="2" class="py-3.5 px-4 text-right uppercase tracking-wider font-extrabold">Total Khusus Admin:</td>
-                    <td class="py-3.5 px-4 text-center font-extrabold text-indigo-800">${sumPerluValidasiUlang.toLocaleString('id-ID')}</td>
-                    <td class="py-3.5 px-4 text-center font-extrabold text-amber-800">${sumBelumTervalidasi.toLocaleString('id-ID')}</td>
+                    <td colspan="2" class="py-3.5 px-4 text-right uppercase tracking-wider font-extrabold">Total Akumulasi:</td>
+                    <td class="py-3.5 px-4 text-center font-extrabold text-indigo-800">${sumPerluVal.toLocaleString('id-ID')}</td>
+                    <td class="py-3.5 px-4 text-center font-extrabold text-amber-800">${sumBelumVal.toLocaleString('id-ID')}</td>
                 </tr>
             `;
         }
@@ -2277,17 +2268,196 @@
             renderAdminRekapTable();
         }
 
-        // ADMIN GATEWAY MODAL LOGIC
+        function exportToExcel() {
+            const records = getFilteredMainTableRecords();
+            const exportData = records.map((item, idx) => ({
+                "No": idx + 1,
+                "Lokus ID": item.id,
+                "Status Validasi": item.status_validasi,
+                "Tahun": item.tahun,
+                "Provinsi": item.provinsi,
+                "Kabupaten/Kota": item.kabkota,
+                "Kecamatan": item.kecamatan,
+                "Desa/Kelurahan": item.desa
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Daftar Lokus");
+            XLSX.writeFile(wb, "Daftar_Lokus_Rumah_DataKu.xlsx");
+        }
+
+        function exportRekapToExcel() {
+            const filterTahun = document.getElementById('filter-tahun') ? document.getElementById('filter-tahun').value : 'all';
+            let targetPerKab = 4;
+            if (filterTahun === "2025") targetPerKab = 1;
+            else if (filterTahun === "2026") targetPerKab = 3;
+
+            const rekapDatabase = rawDatabase.filter(item => (filterTahun === 'all') || (item.tahun === filterTahun));
+            const uniqueLokusMap = new Map();
+            rekapDatabase.forEach(item => { if (!uniqueLokusMap.has(item.id)) uniqueLokusMap.set(item.id, item); });
+
+            const exportData = Object.keys(totalRegenciesByProvince).sort().map((provKey, idx) => {
+                const regencyCount = totalRegenciesByProvince[provKey] || 0;
+                let sesuai = 0, butuhPerbaikan = 0, buktiDukungBelumLengkap = 0, total = 0;
+
+                uniqueLokusMap.forEach(item => {
+                    if (item.provinsi && cleanName(item.provinsi) === provKey) {
+                        total++;
+                        if (item.status_validasi === "Sesuai") sesuai++;
+                        else if (item.status_validasi === "Butuh Perbaikan") butuhPerbaikan++;
+                        else if (item.status_validasi === "belum Ada Bukti Dukung") buktiDukungBelumLengkap++;
+                    }
+                });
+
+                return {
+                    "No": idx + 1,
+                    "Provinsi": toTitleCase(provKey),
+                    "Total Lokus": total,
+                    "Target": regencyCount * targetPerKab,
+                    "Sesuai": sesuai,
+                    "Butuh Perbaikan": butuhPerbaikan,
+                    "belum Ada Bukti Dukung": buktiDukungBelumLengkap
+                };
+            });
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Rekap Status Lokus");
+            XLSX.writeFile(wb, "Rekap_Status_Lokus_Nasional.xlsx");
+        }
+
+        function exportDuplicatesToExcel() {
+            const exportData = duplicateList.map((item, idx) => ({
+                "No": idx + 1,
+                "Provinsi": item.provinsi,
+                "Kabupaten/Kota": item.kabkota,
+                "Kecamatan": item.kecamatan,
+                "Desa/Kelurahan": item.desa,
+                "ID Terlibat": item.ids.join(', '),
+                "Jumlah Entri Baris": item.totalEntries,
+                "Status Analisis": `Konflik ${item.ids.length} ID unik di desa yang sama`
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Audit Duplikat");
+            XLSX.writeFile(wb, "Audit_Duplikat_Lokus.xlsx");
+        }
+
+        function exportPemanfAnomaliesToExcel() {
+            const exportData = pemanfAnomalyList.map((item, idx) => ({
+                "No": idx + 1,
+                "Lokus ID": item.id,
+                "Tahun": item.tahun,
+                "Provinsi": item.provinsi,
+                "Kabupaten/Kota": item.kabkota,
+                "Desa": item.desa,
+                "Isian Nilai Anomali": item.pemanf_aktif,
+                "Rekomendasi Koreksi": "Ganti dengan Ya atau Tidak"
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Anomali Pemanfaatan");
+            XLSX.writeFile(wb, "Anomali_Pemanfaatan_Lokus.xlsx");
+        }
+
+        function exportUpdateAnomaliesToExcel() {
+            const exportData = updateAnomalyList.map((item, idx) => ({
+                "No": idx + 1,
+                "Lokus ID": item.id,
+                "Tahun": item.tahun,
+                "Provinsi": item.provinsi,
+                "Kabupaten/Kota": item.kabkota,
+                "Desa": item.desa,
+                "Isian Nilai Anomali": item.pembaruan,
+                "Rekomendasi Koreksi": "Format ulang ke standar frekuensi"
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Anomali Pemutakhiran");
+            XLSX.writeFile(wb, "Anomali_Pemutakhiran_Lokus.xlsx");
+        }
+
+        function exportIncompleteToExcel() {
+            const exportData = incompleteList.map((item, idx) => ({
+                "No": idx + 1,
+                "Lokus ID": item.id,
+                "Tahun": item.tahun,
+                "Provinsi": item.provinsi,
+                "Kabupaten/Kota": item.kabkota,
+                "Desa": item.desa,
+                "Kolom Kosong": item.empty_fields,
+                "Rekomendasi Koreksi": "Lengkapi isian data sel NULL"
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Data Belum Lengkap");
+            XLSX.writeFile(wb, "Data_Kosong_Belum_Lengkap.xlsx");
+        }
+
+        function exportValidationToExcel() {
+            const exportData = validationList.map((item, idx) => ({
+                "No": idx + 1,
+                "Lokus ID": item.id,
+                "Provinsi": item.provinsi,
+                "Kabupaten/Kota": item.kabkota,
+                "Kecamatan": item.kecamatan,
+                "Desa/Kelurahan": item.desa,
+                "Status Validasi": item.status_validasi,
+                "Rekomendasi Aksi": item.status_validasi === "Perlu Validasi Ulang" ? "Verifikasi perbaikan" : "Peninjauan dokumen"
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Antrean Validasi");
+            XLSX.writeFile(wb, "Daftar_Perlu_Validasi.xlsx");
+        }
+
+        function exportAdminRekapToExcel() {
+            const adminRekapMap = {};
+            Object.keys(totalRegenciesByProvince).forEach(provKey => {
+                adminRekapMap[provKey] = {
+                    provinsi: toTitleCase(provKey),
+                    perluValidasiUlang: 0,
+                    belumTervalidasi: 0
+                };
+            });
+
+            rawDatabase.forEach(item => {
+                const provKey = item.provinsi ? cleanName(item.provinsi) : '';
+                if (provKey && adminRekapMap[provKey]) {
+                    if (item.status_validasi === "Perlu Validasi Ulang") adminRekapMap[provKey].perluValidasiUlang++;
+                    else if (item.status_validasi === "Belum Tervalidasi") adminRekapMap[provKey].belumTervalidasi++;
+                }
+            });
+
+            const exportData = Object.values(adminRekapMap).map((item, idx) => ({
+                "No": idx + 1,
+                "Provinsi": item.provinsi,
+                "Perlu Validasi Ulang": item.perluValidasiUlang,
+                "Belum Tervalidasi": item.belumTervalidasi
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Rekap Admin");
+            XLSX.writeFile(wb, "Rekap_Admin_Validasi_Khusus.xlsx");
+        }
+
         function openAdminGateModal() {
             const modal = document.getElementById('admin-gate-modal');
             const box = document.getElementById('admin-modal-box');
+            const errPanel = document.getElementById('admin-error-panel');
             const pinField = document.getElementById('admin-pin-field');
-            const errorPanel = document.getElementById('admin-error-panel');
 
+            errPanel.classList.add('hidden');
             pinField.value = '';
-            errorPanel.classList.add('hidden');
-            modal.classList.remove('hidden');
 
+            modal.classList.remove('hidden');
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
                 box.classList.remove('scale-95');
@@ -2308,21 +2478,16 @@
         }
 
         function submitAdminPIN() {
-            const pinField = document.getElementById('admin-pin-field');
-            const errorPanel = document.getElementById('admin-error-panel');
-            const pin = pinField.value.trim();
+            const pin = document.getElementById('admin-pin-field').value.trim();
+            const errPanel = document.getElementById('admin-error-panel');
 
-            if (pin === '1234') {
+            if (pin === "1234") {
                 closeAdminGateModal();
-                setTimeout(() => {
-                    document.getElementById('view-dashboard').classList.add('hidden');
-                    document.getElementById('view-admin').classList.remove('hidden');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 200);
+                document.getElementById('view-dashboard').classList.add('hidden');
+                document.getElementById('view-admin').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
-                errorPanel.classList.remove('hidden');
-                pinField.focus();
-                pinField.select();
+                errPanel.classList.remove('hidden');
             }
         }
 
@@ -2330,76 +2495,6 @@
             document.getElementById('view-admin').classList.add('hidden');
             document.getElementById('view-dashboard').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // EXPORT FUNCTIONS (SheetJS)
-        function exportRekapToExcel() {
-            const table = document.querySelector('#tabel-rekap-body').parentElement;
-            const wb = XLSX.utils.table_to_book(table, { sheet: "Rekap Status Lokus" });
-            XLSX.writeFile(wb, "Rekap_Status_Lokus_RumahDataKu.xlsx");
-        }
-
-        function exportToExcel() {
-            const dataToExport = filteredDatabase.map(item => ({
-                "ID Lokus": item.id,
-                "Status Validasi": item.status_validasi,
-                "Status Kelengkapan": item.status_kelengkapan,
-                "Status Perbaikan": item.perbaikan,
-                "Tahun": item.tahun,
-                "Provinsi": item.provinsi,
-                "Kabupaten/Kota": item.kabkota,
-                "Kecamatan": item.kecamatan,
-                "Desa/Kelurahan": item.desa,
-                "Pemutakhiran Data": item.pembaruan,
-                "Status Pemanfaatan": item.pemanf_aktif,
-                "Jenis Pemanfaatan": item.pemanf_jenis
-            }));
-
-            const ws = XLSX.utils.json_to_sheet(dataToExport);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Lokus Rumah DataKu");
-            XLSX.writeFile(wb, "Daftar_Lokus_RumahDataKu.xlsx");
-        }
-
-        function exportDuplicatesToExcel() {
-            const ws = XLSX.utils.json_to_sheet(duplicateList);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Audit Duplikat");
-            XLSX.writeFile(wb, "Audit_Duplikat_Lokus.xlsx");
-        }
-
-        function exportPemanfAnomaliesToExcel() {
-            const ws = XLSX.utils.json_to_sheet(pemanfAnomalyList);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Anomali Pemanfaatan");
-            XLSX.writeFile(wb, "Anomali_Pemanfaatan_Lokus.xlsx");
-        }
-
-        function exportUpdateAnomaliesToExcel() {
-            const ws = XLSX.utils.json_to_sheet(updateAnomalyList);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Anomali Pemutakhiran");
-            XLSX.writeFile(wb, "Anomali_Pemutakhiran_Lokus.xlsx");
-        }
-
-        function exportIncompleteToExcel() {
-            const ws = XLSX.utils.json_to_sheet(incompleteList);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Data Belum Lengkap");
-            XLSX.writeFile(wb, "Data_Belum_Lengkap_Lokus.xlsx");
-        }
-
-        function exportValidationToExcel() {
-            const ws = XLSX.utils.json_to_sheet(validationList);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Daftar Perlu Validasi");
-            XLSX.writeFile(wb, "Daftar_Lokus_Perlu_Validasi.xlsx");
-        }
-
-        function exportAdminRekapToExcel() {
-            const table = document.querySelector('#tabel-admin-rekap-body').parentElement;
-            const wb = XLSX.utils.table_to_book(table, { sheet: "Rekap Admin" });
-            XLSX.writeFile(wb, "Rekap_Khusus_Admin_RumahDataKu.xlsx");
         }
     </script>
 </body>
