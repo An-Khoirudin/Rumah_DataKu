@@ -1006,8 +1006,14 @@
                 const kecKey = Object.keys(item).find(k => k.toLowerCase().includes('kec'));
                 const desaKey = Object.keys(item).find(k => k.toLowerCase().includes('desa') || k.toLowerCase().includes('kel'));
                 const updateKey = Object.keys(item).find(k => k.toLowerCase().includes('pembaruan') || k.toLowerCase().includes('update') || k.toLowerCase().includes('mutakhir'));
-                const pemanfAktifKey = Object.keys(item).find(k => k.toLowerCase().includes('pemanf_aktif') || k.toLowerCase().includes('pemanfaatan aktif') || k.toLowerCase().includes('aktif'));
-                const pemanfJenisKey = Object.keys(item).find(k => k.toLowerCase().includes('pemanf_jenis') || k.toLowerCase().includes('jenis pemanfaatan') || k.toLowerCase().includes('jenis_pemanfaatan'));
+                const pemanfAktifKey = Object.keys(item).find(k => {
+                    const key = k.trim().toLowerCase().replace(/\s+/g, ' ');
+                    return key === 'pemanfaatan' || key.includes('pemanf_aktif') || key.includes('pemanfaatan aktif') || key.endsWith(' aktif');
+                });
+                const pemanfJenisKey = Object.keys(item).find(k => {
+                    const key = k.trim().toLowerCase().replace(/\s+/g, ' ');
+                    return key.includes('pemanf_jenis') || key.includes('jenis pemanfaatan') || key.includes('jenis_pemanfaatan');
+                });
 
                 return {
                     id: item[idKey] ? item[idKey].toString().trim() : '',
@@ -1261,23 +1267,29 @@
         }
 
         function renderChartJenisPemanfaatan() {
-            const uniqueData = getUniqueLokus(filteredDatabase);
             const jenisMap = {};
+            const pemanfaatanData = filteredDatabase.filter(d => d.pemanf_aktif.toLowerCase() === 'ya');
 
-            uniqueData.forEach(d => {
+            pemanfaatanData.forEach(d => {
                 if (d.pemanf_jenis) {
                     const list = d.pemanf_jenis.split(',').map(s => s.trim()).filter(Boolean);
-                    list.forEach(j => {
+                    [...new Set(list)].forEach(j => {
                         const titleJ = toTitleCase(j);
-                        jenisMap[titleJ] = (jenisMap[titleJ] || 0) + 1;
+                        const lokusKey = `${d.id}|${titleJ}`;
+                        jenisMap[lokusKey] = titleJ;
                     });
                 }
             });
 
             if (chartPemanfaatan) chartPemanfaatan.destroy();
 
-            const labels = Object.keys(jenisMap);
-            const data = Object.values(jenisMap);
+            const jenisCounts = {};
+            Object.values(jenisMap).forEach(jenis => {
+                jenisCounts[jenis] = (jenisCounts[jenis] || 0) + 1;
+            });
+
+            const labels = Object.keys(jenisCounts);
+            const data = Object.values(jenisCounts);
 
             const ctx = document.getElementById('chart-jenis-pemanfaatan').getContext('2d');
             chartPemanfaatan = new Chart(ctx, {
@@ -1308,19 +1320,28 @@
         }
 
         function renderChartIntensitasPemanfaatan() {
-            const uniqueData = getUniqueLokus(filteredDatabase);
-            const intensityMap = { '0 Kategori': 0, '1-2 Kategori': 0, '3+ Kategori': 0 };
+            const intensityMap = { '1 Kategori': 0, '2 Kategori': 0, '3 Kategori': 0 };
+            const lokusJenisMap = {};
+            const pemanfaatanData = filteredDatabase.filter(d => d.pemanf_aktif.toLowerCase() === 'ya');
 
-            uniqueData.forEach(d => {
-                if (!d.pemanf_jenis) {
-                    intensityMap['0 Kategori']++;
-                } else {
-                    const count = d.pemanf_jenis.split(',').map(s => s.trim()).filter(Boolean).length;
-                    if (count === 0) intensityMap['0 Kategori']++;
-                    else if (count <= 2) intensityMap['1-2 Kategori']++;
-                    else intensityMap['3+ Kategori']++;
-                }
+            pemanfaatanData.forEach(d => {
+                if (!lokusJenisMap[d.id]) lokusJenisMap[d.id] = new Set();
+                d.pemanf_jenis.split(',').map(s => s.trim()).filter(Boolean).forEach(jenis => {
+                    lokusJenisMap[d.id].add(jenis.toLowerCase());
+                });
             });
+
+            Object.values(lokusJenisMap).forEach(jenisSet => {
+                const count = jenisSet.size;
+                if (count === 1) intensityMap['1 Kategori']++;
+                else if (count === 2) intensityMap['2 Kategori']++;
+                else if (count >= 3) intensityMap['3 Kategori']++;
+            });
+
+            const idsWithoutJenis = getUniqueLokus(pemanfaatanData)
+                .filter(d => !d.pemanf_jenis)
+                .map(d => d.id);
+            idsWithoutJenis.forEach(() => intensityMap['1 Kategori']++);
 
             if (chartIntensitas) chartIntensitas.destroy();
 
