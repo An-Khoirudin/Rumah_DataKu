@@ -1127,7 +1127,7 @@
             const valTahun = document.getElementById('filter-tahun').value;
             const valProv = document.getElementById('filter-provinsi').value;
 
-            let targetPerKab = (valTahun === '2025' || valTahun === '2026') ? 2 : 4;
+            let targetPerKab = valTahun === '2025' ? 1 : (valTahun === '2026' ? 3 : 4);
             let totalTarget = 0;
 
             if (valProv === 'all') {
@@ -1188,7 +1188,8 @@
         function renderChartTren() {
             const years = ['2025', '2026'];
             const counts = years.map(y => {
-                return getUniqueLokus(filteredDatabase.filter(d => d.tahun === y)).length;
+                const cumulativeData = filteredDatabase.filter(d => Number(d.tahun) <= Number(y));
+                return getUniqueLokus(cumulativeData).length;
             });
 
             if (chartTren) chartTren.destroy();
@@ -1408,7 +1409,7 @@
             const valTahun = document.getElementById('filter-tahun').value;
             const filteredForRekap = rawDatabase.filter(d => (valTahun === 'all') || (d.tahun === valTahun));
             
-            const targetPerKab = (valTahun === '2025' || valTahun === '2026') ? 2 : 4;
+            const targetPerKab = valTahun === '2025' ? 1 : (valTahun === '2026' ? 3 : 4);
 
             const provRekap = {};
             Object.keys(totalRegenciesByProvince).forEach(p => {
@@ -1996,7 +1997,7 @@
         function exportRekapToExcel() {
             const valTahun = document.getElementById('filter-tahun').value;
             const filteredForRekap = rawDatabase.filter(d => (valTahun === 'all') || (d.tahun === valTahun));
-            const targetPerKab = (valTahun === '2025' || valTahun === '2026') ? 2 : 4;
+            const targetPerKab = valTahun === '2025' ? 1 : (valTahun === '2026' ? 3 : 4);
 
             const exportArr = Object.keys(totalRegenciesByProvince).sort().map((p, idx) => {
                 const items = filteredForRekap.filter(d => d.provinsi === p);
